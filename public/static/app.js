@@ -141,23 +141,26 @@ function nl2br(str) {
 // ============================================================
 // ROUTER
 // ============================================================
-const routes = {
-  '/': renderHomePage,
-  '/properties': renderPropertiesPage,
-  '/properties/:id': renderPropertyDetailPage,
-  '/jobs': renderJobsPage,
-  '/jobs/new': renderJobFormPage,
-  '/jobs/:id': renderJobDetailPage,
-  '/news': renderNewsPage,
-  '/news/:id': renderNewsDetailPage,
-  '/login': renderLoginPage,
-  '/register': renderRegisterPage,
-  '/mypage': renderMyPage,
-  '/admin': renderAdminPage,
-  '/properties/new': renderPropertyFormPage,
-};
+function getRoutes() {
+  return {
+    '/': renderHomePage,
+    '/properties': renderPropertiesPage,
+    '/properties/new': renderPropertyFormPage,
+    '/properties/:id': renderPropertyDetailPage,
+    '/jobs': renderJobsPage,
+    '/jobs/new': renderJobFormPage,
+    '/jobs/:id': renderJobDetailPage,
+    '/news': renderNewsPage,
+    '/news/:id': renderNewsDetailPage,
+    '/login': renderLoginPage,
+    '/register': renderRegisterPage,
+    '/mypage': renderMyPage,
+    '/admin': renderAdminPage,
+  };
+}
 
 function matchRoute(path) {
+  const routes = getRoutes();
   for (const [pattern, fn] of Object.entries(routes)) {
     if (pattern === path) return { fn, params: {} };
     const patternParts = pattern.split('/');

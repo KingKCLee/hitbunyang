@@ -124,11 +124,11 @@ function getHtmlTemplate(): string {
 <body class="bg-gray-50 font-sans">
   <div id="app"></div>
   <div id="modal-root"></div>
-  <script src="/static/app.js"></script>
-  <script src="/static/app-home.js"></script>
-  <script src="/static/app-properties.js"></script>
-  <script src="/static/app-jobs.js"></script>
-  <script src="/static/app-admin.js"></script>
+  <script src="/static/app.js" defer></script>
+  <script src="/static/app-home.js" defer></script>
+  <script src="/static/app-properties.js" defer></script>
+  <script src="/static/app-jobs.js" defer></script>
+  <script src="/static/app-admin.js" defer></script>
 </body>
 </html>`
 }
