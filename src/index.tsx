@@ -217,9 +217,12 @@ function getHtmlTemplate(): string {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-  <title>분양라인 - 부동산 분양 정보 플랫폼</title>
-  <meta name="description" content="전국 분양 현장 정보와 분양 구인 정보를 한곳에서! 아파트, 오피스텔, 상가 분양 정보 제공">
-  <meta name="theme-color" content="#1e40af">
+  <title>히트분양 - 전국 신규 분양 단지 정보</title>
+  <meta name="description" content="전국 신규 분양 단지 정보와 분양 채용 정보를 한곳에서! 아파트, 오피스텔, 상가 분양 정보 제공 | 히트분양 1533-9077">
+  <meta name="theme-color" content="#dc2626">
+  <meta property="og:title" content="히트분양 - 전국 신규 분양 단지 정보">
+  <meta property="og:description" content="전국 신규 분양 단지 정보를 히트분양에서 확인하세요">
+  <meta property="og:url" content="https://hitbunyang.com">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
   <link rel="stylesheet" href="/static/styles.css">

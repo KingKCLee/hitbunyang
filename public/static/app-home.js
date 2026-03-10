@@ -1,4 +1,4 @@
-// 분양라인 - Part 2: 홈페이지 (배너 슬라이더, 베스트 Top10, 통계 위젯)
+// 히트분양 - Part 2: 홈페이지 (배너 슬라이더, 베스트 Top10, 통계 위젯)
 
 // ============================================================
 // HOME PAGE
@@ -69,24 +69,24 @@ async function renderHomePage(container) {
 // HERO
 // ============================================================
 function renderHeroSection() {
-  const regions = ['서울','경기','인천','부산','대구','광주','대전','충청','전라','경상','강원','제주'];
+  const regions = ['전국','서울','경기북부','경기남부','인천','부산','대구','광주','대전','충청','전라','경상','강원','제주'];
   return `
   <section class="hero-section">
     <div class="container" style="position:relative;z-index:1">
       <div style="text-align:center;margin-bottom:1.5rem">
-        <div style="display:inline-block;background:rgba(251,191,36,0.2);border:1px solid rgba(251,191,36,0.4);
-          color:#fbbf24;font-size:0.78rem;font-weight:700;padding:0.3rem 1rem;border-radius:20px;margin-bottom:1rem;letter-spacing:0.05em">
-          🏆 대한민국 NO.1 분양 정보 플랫폼
+        <div style="display:inline-block;background:rgba(252,211,77,0.2);border:1px solid rgba(252,211,77,0.5);
+          color:#fcd34d;font-size:0.78rem;font-weight:700;padding:0.3rem 1rem;border-radius:20px;margin-bottom:1rem;letter-spacing:0.05em">
+          🔥 대한민국 분양 정보 1번지
         </div>
         <h1 style="font-size:clamp(1.5rem,4vw,2.4rem);font-weight:900;margin-bottom:0.5rem;line-height:1.25">
-          전국 <span style="color:#fbbf24">분양 현장</span> 정보를<br>
-          <span style="color:#34d399">한눈에</span> 확인하세요
+          전국 <span style="color:#fcd34d">신규 분양</span> 단지 정보<br>
+          <span style="color:#6ee7b7">히트분양</span>에서 확인하세요
         </h1>
         <p style="font-size:0.95rem;opacity:0.8;margin-bottom:1.5rem">
-          아파트 · 오피스텔 · 상가 분양 | 팀장 · 팀원 구인
+          아파트 · 오피스텔 · 상가 분양 | 팀장 · 팀원 채용
         </p>
         <div style="max-width:580px;margin:0 auto 1.25rem" class="hero-search-box">
-          <input type="text" id="hero-search" placeholder="지역명, 현장명으로 검색..."
+          <input type="text" id="hero-search" placeholder="단지명, 지역명으로 검색..."
             onkeydown="if(event.key==='Enter')doHeroSearch()">
           <button onclick="doHeroSearch()"><i class="fas fa-search"></i> 검색</button>
         </div>
@@ -104,15 +104,15 @@ function renderHeroSection() {
       <!-- Visitor stats -->
       <div style="display:flex;justify-content:center;gap:0.75rem;flex-wrap:wrap">
         <div class="visitor-bar">
-          <i class="fas fa-users" style="color:#34d399"></i> 오늘 방문자
+          <i class="fas fa-users" style="color:#6ee7b7"></i> 오늘 방문자
           <span class="visitor-count" id="visitor-count-today">-</span>명
         </div>
         <div class="visitor-bar">
-          <i class="fas fa-building" style="color:#fbbf24"></i> 등록 현장
+          <i class="fas fa-building" style="color:#fcd34d"></i> 등록 단지
           <span class="visitor-count" id="stat-total-props-hero">314,124</span>개
         </div>
         <div class="visitor-bar">
-          <i class="fas fa-briefcase" style="color:#a78bfa"></i> 구인 공고
+          <i class="fas fa-briefcase" style="color:#c4b5fd"></i> 채용 공고
           <span class="visitor-count" id="stat-total-jobs-hero">52,381</span>개
         </div>
       </div>
@@ -133,22 +133,22 @@ let currentBannerIndex = 0;
 let totalBanners = 0;
 
 const BANNER_COLORS = [
-  'linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%)',
-  'linear-gradient(135deg, #065f46 0%, #10b981 100%)',
-  'linear-gradient(135deg, #7c2d12 0%, #ef4444 100%)',
+  'linear-gradient(135deg, #7f1d1d 0%, #dc2626 100%)',
+  'linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)',
+  'linear-gradient(135deg, #713f12 0%, #f59e0b 100%)',
+  'linear-gradient(135deg, #14532d 0%, #16a34a 100%)',
   'linear-gradient(135deg, #4c1d95 0%, #8b5cf6 100%)',
-  'linear-gradient(135deg, #0c4a6e 0%, #0ea5e9 100%)',
-  'linear-gradient(135deg, #78350f 0%, #f59e0b 100%)',
-  'linear-gradient(135deg, #1e1b4b 0%, #6366f1 100%)',
-  'linear-gradient(135deg, #881337 0%, #f43f5e 100%)',
-  'linear-gradient(135deg, #14532d 0%, #22c55e 100%)',
-  'linear-gradient(135deg, #0f172a 0%, #475569 100%)',
-  'linear-gradient(135deg, #3b0764 0%, #a855f7 100%)',
-  'linear-gradient(135deg, #0369a1 0%, #38bdf8 100%)',
-  'linear-gradient(135deg, #166534 0%, #4ade80 100%)',
-  'linear-gradient(135deg, #b45309 0%, #fbbf24 100%)',
-  'linear-gradient(135deg, #9d174d 0%, #ec4899 100%)',
-  'linear-gradient(135deg, #1e3a8a 0%, #7c3aed 100%)',
+  'linear-gradient(135deg, #0c4a6e 0%, #0284c7 100%)',
+  'linear-gradient(135deg, #831843 0%, #ec4899 100%)',
+  'linear-gradient(135deg, #1c1917 0%, #78716c 100%)',
+  'linear-gradient(135deg, #064e3b 0%, #10b981 100%)',
+  'linear-gradient(135deg, #312e81 0%, #6366f1 100%)',
+  'linear-gradient(135deg, #7c2d12 0%, #ea580c 100%)',
+  'linear-gradient(135deg, #0f766e 0%, #14b8a6 100%)',
+  'linear-gradient(135deg, #581c87 0%, #a855f7 100%)',
+  'linear-gradient(135deg, #1e40af 0%, #06b6d4 100%)',
+  'linear-gradient(135deg, #7f1d1d 0%, #f43f5e 100%)',
+  'linear-gradient(135deg, #1a2e05 0%, #65a30d 100%)',
 ];
 
 function renderBannerSlider(banners) {
@@ -165,7 +165,7 @@ function renderBannerSlider(banners) {
         <div class="banner-slide-title">${escapeHtml(b.title)}</div>
         ${b.subtitle ? `<div class="banner-slide-subtitle">${escapeHtml(b.subtitle)}</div>` : ''}
       </div>
-      <button class="banner-slide-arrow">상세보기 →</button>
+      <button class="banner-slide-arrow">자세히 보기 →</button>
     </div>`;
   }).join('');
   
@@ -258,10 +258,10 @@ window.prevBanner = prevBanner;
 // ============================================================
 function renderStatsWidget(stats, todayVisitors) {
   const items = [
-    { id: 'stat-total-props', icon: '🏢', label: '총 등록 현장', val: stats?.total_properties || 314124, color: '#dbeafe' },
-    { id: 'stat-total-jobs', icon: '💼', label: '구인 공고', val: stats?.total_jobs || 52381, color: '#d1fae5' },
-    { id: 'stat-total-members', icon: '👥', label: '회원 수', val: stats?.total_members || 128456, color: '#ede9fe' },
-    { id: 'stat-today-visitors', icon: '👁️', label: '오늘 방문자', val: todayVisitors || 0, color: '#fef3c7' },
+    { id: 'stat-total-props', icon: '🏢', label: '총 등록 단지', val: stats?.total_properties || 314124, color: '#fef3c7' },
+    { id: 'stat-total-jobs', icon: '💼', label: '채용 공고', val: stats?.total_jobs || 52381, color: '#dbeafe' },
+    { id: 'stat-total-members', icon: '👥', label: '회원 수', val: stats?.total_members || 128456, color: '#fce7f3' },
+    { id: 'stat-today-visitors', icon: '👁️', label: '오늘 방문자', val: todayVisitors || 0, color: '#d1fae5' },
   ];
   
   return `
@@ -287,21 +287,21 @@ function renderBestProperties(properties) {
   return `
   <div style="margin-bottom:2rem">
     <div class="section-header">
-      <h2 class="section-title">🏆 베스트 현장 TOP 10</h2>
+      <h2 class="section-title">🔥 인기 단지 TOP 10</h2>
       <a class="section-link" href="/properties" onclick="navigate('/properties?sort=hot');return false">전체보기 <i class="fas fa-chevron-right"></i></a>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem" class="best-layout">
       <!-- Left: Top 3 cards -->
       <div style="display:flex;flex-direction:column;gap:1rem">
         <div style="font-size:0.82rem;font-weight:600;color:var(--text-secondary);padding:0 0.25rem">
-          🥇 TOP 3 현장 상세
+          🥇 TOP 3 단지 상세
         </div>
         ${properties.slice(0,3).map((p, i) => renderPropertyCard(p, ['🥇','🥈','🥉'][i])).join('')}
       </div>
       <!-- Right: Full Top 10 list -->
       <div>
         <div style="font-size:0.82rem;font-weight:600;color:var(--text-secondary);padding:0 0.25rem;margin-bottom:0.75rem">
-          📊 전체 순위 (조회+공유+문의 기준)
+          📊 전체 순위 (조회+상담+공유 기준)
         </div>
         <div class="best-list">
           ${properties.map((p, i) => {
@@ -338,21 +338,21 @@ function renderBestProperties(properties) {
 function renderMiddleBanners(banners) {
   return `
   <div style="margin:1.5rem 0;border-radius:14px;overflow:hidden;
-    background:linear-gradient(135deg,#1e3a8a,#2563eb);
+    background:linear-gradient(135deg,#7f1d1d,#dc2626);
     padding:1.5rem 2rem;color:white;
     display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;
-    box-shadow:0 4px 20px rgba(30,64,175,0.25)">
+    box-shadow:0 4px 20px rgba(220,38,38,0.3)">
     <div>
-      <div style="font-size:0.78rem;font-weight:700;color:#fbbf24;letter-spacing:0.1em;margin-bottom:0.4rem">💰 광고 안내</div>
-      <div style="font-size:1.2rem;font-weight:900;margin-bottom:0.25rem">내 현장을 최상단에 노출하세요!</div>
+      <div style="font-size:0.78rem;font-weight:700;color:#fcd34d;letter-spacing:0.1em;margin-bottom:0.4rem">💰 광고 안내</div>
+      <div style="font-size:1.2rem;font-weight:900;margin-bottom:0.25rem">내 단지를 최상단에 노출하세요!</div>
       <div style="opacity:0.8;font-size:0.88rem">프리미엄 · 슈페리어 · 베이직 광고 상품 운영 중</div>
     </div>
     <div style="display:flex;gap:0.75rem;flex-wrap:wrap">
-      <button class="btn" style="background:white;color:#1e40af;font-weight:700" onclick="navigate('/faq')">
+      <button class="btn" style="background:white;color:#dc2626;font-weight:700" onclick="navigate('/faq')">
         <i class="fas fa-ad"></i> 광고 문의
       </button>
       <button class="btn btn-outline" style="border-color:rgba(255,255,255,0.4);color:white" onclick="navigate('/properties')">
-        현장 등록
+        단지 등록
       </button>
     </div>
   </div>`;
@@ -366,7 +366,7 @@ function renderNewProperties(properties) {
   return `
   <div style="margin-bottom:2rem">
     <div class="section-header">
-      <h2 class="section-title">🆕 신규 현장</h2>
+      <h2 class="section-title">🆕 신규 등록 단지</h2>
       <a class="section-link" href="/properties" onclick="navigate('/properties');return false">전체보기 <i class="fas fa-chevron-right"></i></a>
     </div>
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:1.25rem">
@@ -382,11 +382,11 @@ function renderFeaturedJobs(jobs) {
   return `
   <div>
     <div class="section-header">
-      <h2 class="section-title">💼 HOT 구인</h2>
+      <h2 class="section-title">🔥 HOT 채용</h2>
       <a class="section-link" href="/jobs" onclick="navigate('/jobs');return false">전체보기 <i class="fas fa-chevron-right"></i></a>
     </div>
     ${!jobs || !jobs.length 
-      ? '<div class="empty-state"><div class="empty-state-icon">💼</div><div>구인 공고가 없습니다</div></div>'
+      ? '<div class="empty-state"><div class="empty-state-icon">💼</div><div>채용 공고가 없습니다</div></div>'
       : `<div style="display:flex;flex-direction:column;gap:0.6rem">
           ${jobs.map(j => renderJobCardMini(j)).join('')}
          </div>`

@@ -1,4 +1,4 @@
-// 분양라인 - 메인 앱 (상태관리, 유틸, 라우터)
+// 히트분양 - 메인 앱 (상태관리, 유틸, 라우터)
 
 // ============================================================
 // STATE MANAGEMENT
@@ -110,23 +110,23 @@ function getRankLabel(rank) {
 
 function getRegionColor(region) {
   const map = {
-    '서울': '#1d4ed8', '경기': '#065f46', '인천': '#0f766e',
-    '부산': '#c2410c', '충청': '#6d28d9', '전라': '#92400e',
-    '경상': '#991b1b', '강원': '#3730a3', '제주': '#9d174d',
-    '대구': '#b45309', '광주': '#166534', '대전': '#6b21a8',
-    '울산': '#1e3a8a', '세종': '#0369a1',
+    '서울': '#dc2626', '경기북부': '#1d4ed8', '경기남부': '#0369a1',
+    '인천': '#0891b2', '부산': '#ea580c', '충청': '#7c3aed',
+    '전라': '#059669', '경상': '#b45309', '강원': '#6366f1',
+    '대구': '#d97706', '광주': '#10b981', '대전': '#8b5cf6',
+    '울산': '#2563eb', '세종': '#0284c7', '전국': '#374151',
   };
   return map[region] || '#374151';
 }
 
 function getPropertyBgImage(type) {
   const colors = {
-    apartment: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-    officetel: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)',
-    commercial: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-    villa: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
-    land: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
-    other: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
+    apartment: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+    officetel: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
+    commercial: 'linear-gradient(135deg, #eab308 0%, #ca8a04 100%)',
+    villa: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
+    land: 'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)',
+    other: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
   };
   return colors[type] || colors.other;
 }
@@ -254,7 +254,7 @@ function renderApp() {
 }
 
 // ============================================================
-// NAVBAR (6 main menus)
+// NAVBAR
 // ============================================================
 function renderNavbar() {
   const user = state.user;
@@ -273,9 +273,9 @@ function renderNavbar() {
   <nav class="navbar">
     <div class="navbar-inner">
       <div class="navbar-top">
-        <a class="navbar-brand" href="/" onclick="navigate('/');return false">분양<span>라인</span></a>
+        <a class="navbar-brand" href="/" onclick="navigate('/');return false">HIT<span>분양</span></a>
         <div class="navbar-search desktop-only">
-          <input type="text" id="nav-search-input" placeholder="현장명, 지역으로 검색..." 
+          <input type="text" id="nav-search-input" placeholder="단지명, 지역으로 검색..." 
             onkeydown="if(event.key==='Enter'){doNavSearch();}" autocomplete="off">
           <button onclick="doNavSearch()"><i class="fas fa-search"></i></button>
         </div>
@@ -302,20 +302,20 @@ function renderNavbar() {
           </a>
         `).join('')}
         <a class="main-nav-item" href="/jobs" onclick="navigate('/jobs');return false" data-nav-path="/jobs">
-          <i class="fas fa-briefcase"></i> 구인게시판
+          <i class="fas fa-briefcase"></i> 채용정보
         </a>
         <a class="main-nav-item" href="/news" onclick="navigate('/news');return false" data-nav-path="/news">
           <i class="fas fa-newspaper"></i> 뉴스/공지
         </a>
         <a class="main-nav-item" href="/faq" onclick="navigate('/faq');return false" data-nav-path="/faq">
-          <i class="fas fa-question-circle"></i> 고객센터
+          <i class="fas fa-headset"></i> 고객지원
         </a>
       </div>
     </div>
     <!-- Mobile menu -->
     <div id="mobile-menu" class="mobile-menu">
       <div class="mobile-search">
-        <input type="text" id="mobile-search-input" placeholder="현장명, 지역으로 검색..." 
+        <input type="text" id="mobile-search-input" placeholder="단지명, 지역으로 검색..." 
           onkeydown="if(event.key==='Enter'){doMobileSearch();}">
         <button onclick="doMobileSearch()"><i class="fas fa-search"></i></button>
       </div>
@@ -329,7 +329,7 @@ function renderNavbar() {
         `).join('')}
         <a class="mobile-menu-item ${path.startsWith('/jobs') ? 'active' : ''}" 
           href="/jobs" onclick="navigate('/jobs');toggleMobileMenu();return false">
-          <i class="fas fa-briefcase"></i><span>구인게시판</span>
+          <i class="fas fa-briefcase"></i><span>채용정보</span>
         </a>
         <a class="mobile-menu-item ${path.startsWith('/news') ? 'active' : ''}"
           href="/news" onclick="navigate('/news');toggleMobileMenu();return false">
@@ -337,7 +337,7 @@ function renderNavbar() {
         </a>
         <a class="mobile-menu-item ${path.startsWith('/faq') ? 'active' : ''}"
           href="/faq" onclick="navigate('/faq');toggleMobileMenu();return false">
-          <i class="fas fa-question-circle"></i><span>고객센터</span>
+          <i class="fas fa-headset"></i><span>고객지원</span>
         </a>
       </div>
     </div>
@@ -373,12 +373,12 @@ function renderFooter() {
     <div class="container">
       <div class="footer-grid">
         <div class="footer-col">
-          <div class="footer-brand">분양<span>라인</span></div>
-          <p class="footer-desc">전국 분양 현장 정보와 구인 정보를<br>한곳에서 확인하세요.</p>
+          <div class="footer-brand">HIT<span>분양</span></div>
+          <p class="footer-desc">전국 신규 분양 단지 정보와<br>채용 정보를 한곳에서 확인하세요.</p>
           <div class="footer-contact">
-            <div><i class="fas fa-phone"></i> 고객센터: <strong>1660-0464</strong></div>
+            <div><i class="fas fa-phone"></i> 분양라인: <strong>1533-9077</strong></div>
             <div><i class="fas fa-fax"></i> FAX: 02-000-0000</div>
-            <div><i class="fas fa-envelope"></i> info@bunyang.com</div>
+            <div><i class="fas fa-envelope"></i> info@hitbunyang.com</div>
             <div style="font-size:0.78rem;color:rgba(255,255,255,0.4);margin-top:0.5rem">평일 09:00 ~ 18:00 (점심 12:00~13:00)</div>
           </div>
         </div>
@@ -396,9 +396,9 @@ function renderFooter() {
         <div class="footer-col">
           <div class="footer-section-title">정보</div>
           <div class="footer-links">
-            <a class="footer-link" href="/jobs" onclick="navigate('/jobs');return false">구인게시판</a>
+            <a class="footer-link" href="/jobs" onclick="navigate('/jobs');return false">채용정보</a>
             <a class="footer-link" href="/news" onclick="navigate('/news');return false">뉴스/공지</a>
-            <a class="footer-link" href="/faq" onclick="navigate('/faq');return false">고객센터/FAQ</a>
+            <a class="footer-link" href="/faq" onclick="navigate('/faq');return false">고객지원/FAQ</a>
           </div>
         </div>
         <div class="footer-col">
@@ -413,7 +413,7 @@ function renderFooter() {
       </div>
       <div class="footer-bottom">
         <div class="footer-bottom-left">
-          <span>© 2025 분양라인. All rights reserved.</span>
+          <span>© 2025 히트분양(HIT분양). All rights reserved.</span>
           <span>사업자등록번호: 000-00-00000</span>
           <span>대표: 홍길동</span>
         </div>
@@ -436,7 +436,7 @@ function renderPropertyCard(p, rank) {
   if (p.is_hot) badges.push('<span class="badge badge-hot">HOT</span>');
   if (p.is_new) badges.push('<span class="badge badge-new">NEW</span>');
   if (p.is_featured) badges.push('<span class="badge badge-featured">추천</span>');
-  if (p.status === 'upcoming') badges.push('<span class="badge badge-upcoming">예정</span>');
+  if (p.status === 'upcoming') badges.push('<span class="badge badge-upcoming">분양예정</span>');
   
   const adClass = p.ad_type === 'premium' ? 'ad-premium' : p.ad_type === 'superior' ? 'ad-superior' : '';
   const rankBadge = rank ? `<div class="rank-badge">${rank}</div>` : '';
@@ -466,7 +466,7 @@ function renderPropertyCard(p, rank) {
     </div>
     <div class="card-footer">
       <span><i class="fas fa-eye"></i> ${(p.view_count||0).toLocaleString()}</span>
-      <span><i class="fas fa-comment"></i> 문의 ${(p.inquiry_count||0).toLocaleString()}</span>
+      <span><i class="fas fa-comment"></i> 상담 ${(p.inquiry_count||0).toLocaleString()}</span>
       <span>${timeAgo(p.created_at)}</span>
     </div>
   </div>`;

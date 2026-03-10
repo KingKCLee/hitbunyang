@@ -1,4 +1,4 @@
-// 분양라인 - Part 3: 분양현장 목록/상세 페이지
+// 히트분양 - Part 3: 분양단지 목록/상세 페이지
 
 // ============================================================
 // PROPERTIES LIST PAGE
@@ -16,7 +16,7 @@ async function renderPropertiesPage(container) {
     <div class="container">
       <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.75rem">
         <span style="font-size:1.25rem">🏢</span>
-        <h1 style="font-size:1.2rem;font-weight:800">분양 현장 목록</h1>
+        <h1 style="font-size:1.2rem;font-weight:800">분양 단지 목록</h1>
       </div>
       <div class="filter-bar">
         <div style="display:flex;flex-wrap:wrap;gap:0.75rem;align-items:center">
@@ -36,7 +36,7 @@ async function renderPropertiesPage(container) {
           <div style="display:flex;gap:0.5rem;margin-left:auto;align-items:center;flex-wrap:wrap">
             <div style="position:relative">
               <i class="fas fa-search" style="position:absolute;left:0.7rem;top:50%;transform:translateY(-50%);color:#9ca3af;font-size:0.8rem"></i>
-              <input type="text" id="prop-search" value="${escapeHtml(search)}" placeholder="현장명/지역 검색"
+              <input type="text" id="prop-search" value="${escapeHtml(search)}" placeholder="단지명/지역 검색"
                 style="padding:0.45rem 0.75rem 0.45rem 2rem;border:1.5px solid #e5e7eb;border-radius:8px;font-size:0.85rem;outline:none;width:180px"
                 onkeydown="if(event.key==='Enter')updatePropertyFilter('search',this.value)">
             </div>
@@ -129,7 +129,7 @@ async function renderPropertyDetailPage(container, params) {
     <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:1rem;font-size:0.85rem;color:#6b7280">
       <a href="/" onclick="navigate('/');return false" style="color:#6b7280;text-decoration:none">홈</a>
       <i class="fas fa-chevron-right" style="font-size:0.7rem"></i>
-      <a href="/properties" onclick="navigate('/properties');return false" style="color:#6b7280;text-decoration:none">분양현장</a>
+      <a href="/properties" onclick="navigate('/properties');return false" style="color:#6b7280;text-decoration:none">분양단지</a>
       <i class="fas fa-chevron-right" style="font-size:0.7rem"></i>
       <span style="color:#1f2937">${escapeHtml(p.title)}</span>
     </div>
@@ -213,7 +213,7 @@ async function renderPropertyDetailPage(container, params) {
         ${related.length ? `
         <div>
           <div class="section-header">
-            <h3 class="section-title">같은 지역 분양현장</h3>
+            <h3 class="section-title">같은 지역 분양단지</h3>
           </div>
           <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1rem">
             ${related.map(rp => renderPropertyCard(rp)).join('')}
@@ -322,13 +322,13 @@ async function renderPropertyFormPage(container) {
       <button onclick="history.back()" class="btn btn-secondary btn-sm">
         <i class="fas fa-arrow-left"></i>
       </button>
-      <h1 style="font-size:1.25rem;font-weight:800">분양 현장 등록</h1>
+      <h1 style="font-size:1.25rem;font-weight:800">분양 단지 등록</h1>
     </div>
     <div style="background:white;border-radius:16px;padding:1.5rem;box-shadow:0 2px 12px rgba(0,0,0,0.07)">
       <form onsubmit="submitProperty(event)">
         <div class="form-grid-2">
           <div class="form-group">
-            <label class="form-label">현장명 *</label>
+            <label class="form-label">단지명 *</label>
             <input class="form-input" name="title" required placeholder="예) 힐스테이트 판교역 1차">
           </div>
           <div class="form-group">

@@ -1,4 +1,4 @@
-// 분양라인 - Part 4: 구인게시판 + 회원 + 뉴스 + 관리자
+// 히트분양 - Part 4: 채용정보 + 회원 + 뉴스 + 관리자
 
 // ============================================================
 // JOBS LIST PAGE
@@ -20,7 +20,7 @@ async function renderJobsPage(container) {
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.75rem;margin-bottom:0.75rem">
         <div style="display:flex;align-items:center;gap:0.5rem">
           <span style="font-size:1.25rem">💼</span>
-          <h1 style="font-size:1.2rem;font-weight:800">분양 구인 게시판</h1>
+          <h1 style="font-size:1.2rem;font-weight:800">💼 분양 채용정보</h1>
         </div>
         ${state.user ? `<button class="btn btn-primary btn-sm" onclick="navigate('/jobs/new')"><i class="fas fa-plus"></i> 구인 공고 등록</button>` : 
           `<button class="btn btn-outline btn-sm" onclick="navigate('/login')"><i class="fas fa-lock"></i> 로그인 후 등록</button>`}
@@ -95,13 +95,13 @@ async function loadJobs(region, rank, min_commission, min_daily, has_accommodati
   const { data, total, pages } = r.data;
   
   if (!data.length) {
-    list.innerHTML = `<div class="empty-state"><div class="empty-state-icon">💼</div><div class="empty-state-text">등록된 구인 공고가 없습니다.</div></div>`;
+    list.innerHTML = `<div class="empty-state"><div class="empty-state-icon">💼</div><div class="empty-state-text">등록된 채용 공고가 없습니다.</div></div>`;
     return;
   }
   
   list.innerHTML = `
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
-      <span style="font-size:0.9rem;color:#6b7280">총 <strong style="color:#1f2937">${total.toLocaleString()}</strong>개의 공고</span>
+      <span style="font-size:0.9rem;color:#6b7280">총 <strong style="color:#1f2937">${total.toLocaleString()}</strong>개의 채용 공고</span>
     </div>
     ${data.map(j => renderJobCard(j)).join('')}
     ${renderPagination(page, pages, (p) => updateJobFilter('page', p))}`;
@@ -164,7 +164,7 @@ async function renderJobDetailPage(container, params) {
     <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:1rem;font-size:0.85rem;color:#6b7280">
       <a href="/" onclick="navigate('/');return false" style="color:#6b7280;text-decoration:none">홈</a>
       <i class="fas fa-chevron-right" style="font-size:0.7rem"></i>
-      <a href="/jobs" onclick="navigate('/jobs');return false" style="color:#6b7280;text-decoration:none">구인게시판</a>
+      <a href="/jobs" onclick="navigate('/jobs');return false" style="color:#6b7280;text-decoration:none">채용정보</a>
       <i class="fas fa-chevron-right" style="font-size:0.7rem"></i>
       <span style="color:#1f2937">${escapeHtml(j.title)}</span>
     </div>
@@ -306,7 +306,7 @@ async function renderJobFormPage(container) {
   <div class="container" style="padding:2rem 1rem;max-width:760px">
     <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:1.5rem">
       <button onclick="history.back()" class="btn btn-secondary btn-sm"><i class="fas fa-arrow-left"></i></button>
-      <h1 style="font-size:1.25rem;font-weight:800">구인 공고 등록</h1>
+      <h1 style="font-size:1.25rem;font-weight:800">채용 공고 등록</h1>
     </div>
     <div style="background:white;border-radius:16px;padding:1.5rem;box-shadow:0 2px 12px rgba(0,0,0,0.07)">
       <form onsubmit="submitJobPost(event)">
