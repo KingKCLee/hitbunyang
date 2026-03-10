@@ -1,4 +1,4 @@
-// 히트분양 - 메인 앱 (상태관리, 유틸, 라우터)
+// 히트분양 - 메인 앱 (상태관리, 유틸, 라우터) v4
 
 // ============================================================
 // STATE MANAGEMENT
@@ -115,6 +115,7 @@ function getRegionColor(region) {
     '전라': '#059669', '경상': '#b45309', '강원': '#6366f1',
     '대구': '#d97706', '광주': '#10b981', '대전': '#8b5cf6',
     '울산': '#2563eb', '세종': '#0284c7', '전국': '#374151',
+    '경기': '#1d4ed8',
   };
   return map[region] || '#374151';
 }
@@ -155,37 +156,109 @@ function animateNumber(el, target, duration = 1500) {
   requestAnimationFrame(update);
 }
 
+// 히트지수 계산 (0~100)
+function calcHitScore(p) {
+  if (!p) return 0;
+  const views = Math.min((p.view_count || 0) / 10, 30);       // max 30점
+  const inquiries = Math.min((p.inquiry_count || 0) * 3, 30); // max 30점
+  const shares = Math.min((p.share_count || 0) * 2, 20);      // max 20점
+  const adBonus = p.ad_type === 'premium' ? 15 : p.ad_type === 'superior' ? 8 : p.ad_type === 'standard' ? 4 : 0; // max 15점
+  const newBonus = p.is_new ? 5 : 0; // max 5점
+  return Math.min(Math.round(views + inquiries + shares + adBonus + newBonus), 100);
+}
+
+function getHitScoreColor(score) {
+  if (score >= 80) return '#dc2626';
+  if (score >= 50) return '#f97316';
+  return '#3b82f6';
+}
+
+function getHitScoreLabel(score) {
+  if (score >= 80) return '🔥 히트';
+  if (score >= 60) return '⚡ 인기';
+  if (score >= 40) return '📈 상승';
+  return '🆕 신규';
+}
+
+// 히트지수 게이지 HTML
+function renderHitGauge(score, size = 'sm') {
+  const color = getHitScoreColor(score);
+  const label = getHitScoreLabel(score);
+  if (size === 'lg') {
+    return `
+    <div class="hit-gauge-lg">
+      <div class="hit-gauge-circle" style="--score:${score};--color:${color}">
+        <svg viewBox="0 0 36 36" class="hit-gauge-svg">
+          <circle cx="18" cy="18" r="15.9" fill="none" stroke="#f3f4f6" stroke-width="3"/>
+          <circle cx="18" cy="18" r="15.9" fill="none" stroke="${color}" stroke-width="3"
+            stroke-dasharray="${score} ${100 - score}"
+            stroke-dashoffset="25" stroke-linecap="round"/>
+        </svg>
+        <div class="hit-gauge-value" style="color:${color}">${score}</div>
+      </div>
+      <div class="hit-gauge-label">${label}</div>
+    </div>`;
+  }
+  return `
+  <div class="hit-score-badge" style="--color:${color}" title="히트지수 ${score}점">
+    <div class="hit-score-bar-wrap">
+      <div class="hit-score-bar" style="width:${score}%;background:${color}"></div>
+    </div>
+    <span class="hit-score-num" style="color:${color}">${score}</span>
+  </div>`;
+}
+
 // ============================================================
 // ROUTER
 // ============================================================
 function getRoutes() {
   return {
     '/': renderHomePage,
+    // 현장찾기 관련
+    '/sites': renderSitesPage,
     '/properties': renderPropertiesPage,
     '/properties/new': renderPropertyFormPage,
     '/properties/:id': renderPropertyDetailPage,
+    // 히트맵
+    '/hitmap': renderHitmapPage,
+    '/map': renderMapPage,
+    // 히트랭킹
+    '/ranking': renderRankingPage,
+    // 맞춤현장
+    '/match': renderMatchPage,
+    '/custom': renderCustomPage,
+    // 커뮤니티
+    '/community': renderCommunityPage,
+    // 히트분양TV
+    '/tv': renderTvPage,
+    // 뉴스
+    '/news': renderNewsPage,
+    '/news/:id': renderNewsDetailPage,
+    // 광고안내
+    '/ad-info': renderAdInfoPage,
+    // 고객센터
+    '/support': renderSupportPage,
+    '/faq': renderFaqPage,
+    // 채용
     '/jobs': renderJobsPage,
     '/jobs/new': renderJobFormPage,
     '/jobs/:id': renderJobDetailPage,
-    '/news': renderNewsPage,
-    '/news/:id': renderNewsDetailPage,
+    // 회원
     '/login': renderLoginPage,
     '/register': renderRegisterPage,
+    '/auth': renderAuthPage,
     '/mypage': renderMyPage,
-    '/admin': renderAdminPage,
-    // 6 main menus
+    '/my': renderMyPage,
+    // 기타
     '/region': renderRegionPage,
-    '/custom': renderCustomPage,
-    '/map': renderMapPage,
     '/favorites': renderFavoritesPage,
     '/supporters': renderSupportersPage,
-    '/faq': renderFaqPage,
+    '/admin': renderAdminPage,
   };
 }
 
 function matchRoute(path) {
   const routes = getRoutes();
-  // exact match first
   if (routes[path]) return { fn: routes[path], params: {} };
   for (const [pattern, fn] of Object.entries(routes)) {
     if (pattern === path) return { fn, params: {} };
@@ -245,7 +318,6 @@ function renderApp() {
     </div>`;
   }
   
-  // Update active nav
   document.querySelectorAll('[data-nav-path]').forEach(el => {
     const navPath = el.getAttribute('data-nav-path');
     const isActive = navPath === '/' ? path === '/' : path.startsWith(navPath);
@@ -254,91 +326,115 @@ function renderApp() {
 }
 
 // ============================================================
-// NAVBAR
+// NAVBAR (새 메뉴 구조)
 // ============================================================
 function renderNavbar() {
   const user = state.user;
   const path = location.pathname;
   
+  // 새 메인 메뉴 구조
   const mainMenus = [
-    { label: 'HOME', path: '/', icon: 'fa-home' },
-    { label: '지역현장', path: '/region', icon: 'fa-map-marker-alt' },
-    { label: '맞춤현장', path: '/custom', icon: 'fa-sliders-h' },
-    { label: '지도현장', path: '/map', icon: 'fa-map' },
-    { label: '관심현장', path: '/favorites', icon: 'fa-heart' },
-    { label: '서포터즈', path: '/supporters', icon: 'fa-users' },
+    { label: '현장찾기', path: '/sites', icon: 'fa-search-location', hot: false },
+    { label: '히트맵', path: '/hitmap', icon: 'fa-fire-alt', hot: true },
+    { label: '히트랭킹', path: '/ranking', icon: 'fa-trophy', hot: true },
+    { label: '맞춤현장', path: '/match', icon: 'fa-magic', hot: false },
+    { label: '커뮤니티', path: '/community', icon: 'fa-comments', hot: false },
+    { label: '히트TV', path: '/tv', icon: 'fa-play-circle', hot: false },
+  ];
+
+  const subMenus = [
+    { label: '뉴스', path: '/news', icon: 'fa-newspaper' },
+    { label: '채용정보', path: '/jobs', icon: 'fa-briefcase' },
+    { label: '광고안내', path: '/ad-info', icon: 'fa-ad' },
+    { label: '고객센터', path: '/support', icon: 'fa-headset' },
   ];
 
   return `
-  <nav class="navbar">
+  <nav class="navbar" id="main-navbar">
     <div class="navbar-inner">
       <div class="navbar-top">
-        <a class="navbar-brand" href="/" onclick="navigate('/');return false">HIT<span>분양</span></a>
+        <a class="navbar-brand" href="/" onclick="navigate('/');return false">
+          <span class="brand-hit">HIT</span><span class="brand-bun">분양</span>
+          <span class="brand-tag">HITBUNYANG</span>
+        </a>
         <div class="navbar-search desktop-only">
-          <input type="text" id="nav-search-input" placeholder="단지명, 지역으로 검색..." 
-            onkeydown="if(event.key==='Enter'){doNavSearch();}" autocomplete="off">
-          <button onclick="doNavSearch()"><i class="fas fa-search"></i></button>
+          <div class="search-wrap">
+            <input type="text" id="nav-search-input" placeholder="현장명, 지역으로 검색..." 
+              onkeydown="if(event.key==='Enter'){doNavSearch();}" autocomplete="off">
+            <button onclick="doNavSearch()"><i class="fas fa-search"></i></button>
+          </div>
         </div>
         <div class="navbar-actions">
           ${user ? `
-            <span class="user-name-badge">${escapeHtml(user.name)}님</span>
-            ${user.user_type === 'admin' ? `<a class="nav-action-btn" onclick="navigate('/admin');return false" href="/admin">관리자</a>` : ''}
-            <a class="nav-action-btn" onclick="navigate('/mypage');return false" href="/mypage">마이페이지</a>
-            <button class="nav-action-btn" onclick="handleLogout()">로그아웃</button>
+            <span class="user-name-badge"><i class="fas fa-user-circle"></i> ${escapeHtml(user.name)}</span>
+            ${user.user_type === 'admin' ? `<a class="nav-action-btn" onclick="navigate('/admin');return false" href="/admin"><i class="fas fa-cog"></i></a>` : ''}
+            <a class="nav-action-btn" onclick="navigate('/my');return false" href="/my"><i class="fas fa-user"></i> MY</a>
+            <button class="nav-action-btn" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i></button>
           ` : `
             <a class="nav-action-btn" onclick="navigate('/login');return false" href="/login">로그인</a>
-            <a class="nav-action-btn accent" onclick="navigate('/register');return false" href="/register">회원가입</a>
+            <a class="nav-action-btn accent" onclick="navigate('/register');return false" href="/register">무료가입</a>
           `}
           <button id="mobile-toggle" class="mobile-toggle-btn" onclick="toggleMobileMenu()" aria-label="메뉴">
             <i class="fas fa-bars"></i>
           </button>
         </div>
       </div>
+      <!-- 메인 메뉴 바 -->
       <div class="navbar-bottom desktop-only">
         ${mainMenus.map(m => `
           <a class="main-nav-item ${(m.path === '/' ? path === '/' : path.startsWith(m.path)) ? 'active' : ''}" 
             href="${m.path}" onclick="navigate('${m.path}');return false" data-nav-path="${m.path}">
             <i class="fas ${m.icon}"></i> ${m.label}
+            ${m.hot ? `<span class="nav-hot-badge">NEW</span>` : ''}
           </a>
         `).join('')}
-        <a class="main-nav-item" href="/jobs" onclick="navigate('/jobs');return false" data-nav-path="/jobs">
-          <i class="fas fa-briefcase"></i> 채용정보
-        </a>
-        <a class="main-nav-item" href="/news" onclick="navigate('/news');return false" data-nav-path="/news">
-          <i class="fas fa-newspaper"></i> 뉴스/공지
-        </a>
-        <a class="main-nav-item" href="/faq" onclick="navigate('/faq');return false" data-nav-path="/faq">
-          <i class="fas fa-headset"></i> 고객지원
+        <div class="nav-divider"></div>
+        ${subMenus.map(m => `
+          <a class="main-nav-item sub ${path.startsWith(m.path) ? 'active' : ''}" 
+            href="${m.path}" onclick="navigate('${m.path}');return false" data-nav-path="${m.path}">
+            <i class="fas ${m.icon}"></i> ${m.label}
+          </a>
+        `).join('')}
+        <a class="nav-hit-score-link desktop-only" href="/ranking" onclick="navigate('/ranking');return false">
+          <i class="fas fa-fire" style="color:#fcd34d"></i> 히트지수란?
         </a>
       </div>
     </div>
     <!-- Mobile menu -->
     <div id="mobile-menu" class="mobile-menu">
       <div class="mobile-search">
-        <input type="text" id="mobile-search-input" placeholder="단지명, 지역으로 검색..." 
+        <input type="text" id="mobile-search-input" placeholder="현장명, 지역으로 검색..." 
           onkeydown="if(event.key==='Enter'){doMobileSearch();}">
         <button onclick="doMobileSearch()"><i class="fas fa-search"></i></button>
       </div>
-      <div class="mobile-menu-grid">
-        ${mainMenus.map(m => `
-          <a class="mobile-menu-item ${(m.path === '/' ? path === '/' : path.startsWith(m.path)) ? 'active' : ''}"
-            href="${m.path}" onclick="navigate('${m.path}');toggleMobileMenu();return false">
-            <i class="fas ${m.icon}"></i>
-            <span>${m.label}</span>
+      <div class="mobile-menu-section">
+        <div class="mobile-menu-section-title">메인 서비스</div>
+        <div class="mobile-menu-grid">
+          ${mainMenus.map(m => `
+            <a class="mobile-menu-item ${(m.path === '/' ? path === '/' : path.startsWith(m.path)) ? 'active' : ''}"
+              href="${m.path}" onclick="navigate('${m.path}');toggleMobileMenu();return false">
+              <i class="fas ${m.icon}"></i>
+              <span>${m.label}</span>
+              ${m.hot ? `<em class="mobile-hot">NEW</em>` : ''}
+            </a>
+          `).join('')}
+        </div>
+      </div>
+      <div class="mobile-menu-section">
+        <div class="mobile-menu-section-title">더보기</div>
+        <div class="mobile-menu-grid">
+          ${subMenus.map(m => `
+            <a class="mobile-menu-item ${path.startsWith(m.path) ? 'active' : ''}"
+              href="${m.path}" onclick="navigate('${m.path}');toggleMobileMenu();return false">
+              <i class="fas ${m.icon}"></i>
+              <span>${m.label}</span>
+            </a>
+          `).join('')}
+          <a class="mobile-menu-item ${path === '/' ? 'active' : ''}"
+            href="/" onclick="navigate('/');toggleMobileMenu();return false">
+            <i class="fas fa-home"></i><span>홈</span>
           </a>
-        `).join('')}
-        <a class="mobile-menu-item ${path.startsWith('/jobs') ? 'active' : ''}" 
-          href="/jobs" onclick="navigate('/jobs');toggleMobileMenu();return false">
-          <i class="fas fa-briefcase"></i><span>채용정보</span>
-        </a>
-        <a class="mobile-menu-item ${path.startsWith('/news') ? 'active' : ''}"
-          href="/news" onclick="navigate('/news');toggleMobileMenu();return false">
-          <i class="fas fa-newspaper"></i><span>뉴스/공지</span>
-        </a>
-        <a class="mobile-menu-item ${path.startsWith('/faq') ? 'active' : ''}"
-          href="/faq" onclick="navigate('/faq');toggleMobileMenu();return false">
-          <i class="fas fa-headset"></i><span>고객지원</span>
-        </a>
+        </div>
       </div>
     </div>
   </nav>`;
@@ -346,12 +442,12 @@ function renderNavbar() {
 
 function doNavSearch() {
   const q = document.getElementById('nav-search-input')?.value?.trim();
-  if (q) navigate('/properties?search=' + encodeURIComponent(q));
+  if (q) navigate('/sites?search=' + encodeURIComponent(q));
 }
 
 function doMobileSearch() {
   const q = document.getElementById('mobile-search-input')?.value?.trim();
-  if (q) { navigate('/properties?search=' + encodeURIComponent(q)); toggleMobileMenu(); }
+  if (q) { navigate('/sites?search=' + encodeURIComponent(q)); toggleMobileMenu(); }
 }
 
 function toggleMobileMenu() {
@@ -372,55 +468,73 @@ function renderFooter() {
   <footer class="footer">
     <div class="container">
       <div class="footer-grid">
-        <div class="footer-col">
-          <div class="footer-brand">HIT<span>분양</span></div>
-          <p class="footer-desc">전국 신규 분양 단지 정보와<br>채용 정보를 한곳에서 확인하세요.</p>
+        <div class="footer-col footer-col-brand">
+          <div class="footer-brand"><span class="brand-hit">HIT</span><span class="brand-bun">분양</span></div>
+          <p class="footer-tagline">대한민국 분양정보 히트 플랫폼</p>
+          <p class="footer-desc">전국 신규 분양 단지 정보와 분양 채용 정보를<br>히트지수 기반으로 한눈에!</p>
           <div class="footer-contact">
-            <div><i class="fas fa-phone"></i> 분양라인: <strong>1533-9077</strong></div>
-            <div><i class="fas fa-fax"></i> FAX: 02-000-0000</div>
+            <div><i class="fas fa-phone"></i> 고객지원: <strong>1533-9077</strong></div>
+            <div><i class="fas fa-clock"></i> 평일 09:00~18:00 (점심 12:00~13:00)</div>
             <div><i class="fas fa-envelope"></i> info@hitbunyang.com</div>
-            <div style="font-size:0.78rem;color:rgba(255,255,255,0.4);margin-top:0.5rem">평일 09:00 ~ 18:00 (점심 12:00~13:00)</div>
+          </div>
+          <div class="footer-sns">
+            <a href="#" class="footer-sns-btn" title="유튜브"><i class="fab fa-youtube"></i></a>
+            <a href="#" class="footer-sns-btn" title="인스타그램"><i class="fab fa-instagram"></i></a>
+            <a href="#" class="footer-sns-btn" title="카카오톡"><i class="fas fa-comment-dots"></i></a>
+            <a href="#" class="footer-sns-btn" title="네이버블로그"><i class="fas fa-blog"></i></a>
           </div>
         </div>
         <div class="footer-col">
           <div class="footer-section-title">서비스</div>
           <div class="footer-links">
-            <a class="footer-link" href="/" onclick="navigate('/');return false">HOME</a>
-            <a class="footer-link" href="/region" onclick="navigate('/region');return false">지역현장</a>
-            <a class="footer-link" href="/custom" onclick="navigate('/custom');return false">맞춤현장</a>
-            <a class="footer-link" href="/map" onclick="navigate('/map');return false">지도현장</a>
-            <a class="footer-link" href="/favorites" onclick="navigate('/favorites');return false">관심현장</a>
-            <a class="footer-link" href="/supporters" onclick="navigate('/supporters');return false">서포터즈</a>
+            <a class="footer-link" href="/sites" onclick="navigate('/sites');return false"><i class="fas fa-search-location"></i> 현장찾기</a>
+            <a class="footer-link" href="/hitmap" onclick="navigate('/hitmap');return false"><i class="fas fa-fire-alt"></i> 히트맵</a>
+            <a class="footer-link" href="/ranking" onclick="navigate('/ranking');return false"><i class="fas fa-trophy"></i> 히트랭킹</a>
+            <a class="footer-link" href="/match" onclick="navigate('/match');return false"><i class="fas fa-magic"></i> 맞춤현장</a>
+            <a class="footer-link" href="/community" onclick="navigate('/community');return false"><i class="fas fa-comments"></i> 커뮤니티</a>
+            <a class="footer-link" href="/tv" onclick="navigate('/tv');return false"><i class="fas fa-play-circle"></i> 히트TV</a>
           </div>
         </div>
         <div class="footer-col">
           <div class="footer-section-title">정보</div>
           <div class="footer-links">
-            <a class="footer-link" href="/jobs" onclick="navigate('/jobs');return false">채용정보</a>
             <a class="footer-link" href="/news" onclick="navigate('/news');return false">뉴스/공지</a>
-            <a class="footer-link" href="/faq" onclick="navigate('/faq');return false">고객지원/FAQ</a>
+            <a class="footer-link" href="/jobs" onclick="navigate('/jobs');return false">채용정보</a>
+            <a class="footer-link" href="/ad-info" onclick="navigate('/ad-info');return false">광고안내</a>
+            <a class="footer-link" href="/support" onclick="navigate('/support');return false">고객센터/FAQ</a>
           </div>
+          <div class="footer-section-title" style="margin-top:1.25rem">광고 상품</div>
+          <div class="footer-ad-tiers">
+            <div class="footer-ad-tier hit">🔥 히트AD<span>히어로 슬롯 + 맵 강조</span></div>
+            <div class="footer-ad-tier premium">⭐ 프리미엄<span>상단 우선노출</span></div>
+            <div class="footer-ad-tier standard">📌 스탠다드<span>하이라이트 배경</span></div>
+          </div>
+          <button class="footer-ad-btn" onclick="navigate('/ad-info')">광고 신청하기 →</button>
         </div>
         <div class="footer-col">
-          <div class="footer-section-title">광고 상품</div>
-          <div class="footer-ad-tiers">
-            <div class="footer-ad-tier premium">🥇 프리미엄<span>최상단 고정 노출</span></div>
-            <div class="footer-ad-tier superior">🥈 슈페리어<span>상위 노출 보장</span></div>
-            <div class="footer-ad-tier basic">🥉 베이직<span>일반 우선 노출</span></div>
+          <div class="footer-section-title">히트지수란?</div>
+          <div style="font-size:0.82rem;color:rgba(255,255,255,0.55);line-height:1.9">
+            <div>📊 조회수 · 문의수 · 공유수</div>
+            <div>⭐ 광고 등급 · 신규 등록</div>
+            <div>🏢 대행사 리뷰 점수</div>
+            <div style="margin-top:0.5rem;color:rgba(255,255,255,0.35)">를 가중 합산한 0~100점</div>
           </div>
-          <button class="footer-ad-btn" onclick="navigate('/faq')">광고 문의하기 →</button>
+          <button class="btn btn-sm" style="margin-top:1rem;background:rgba(253,211,77,0.15);color:#fcd34d;border:1px solid rgba(253,211,77,0.3)"
+            onclick="navigate('/ranking')">
+            <i class="fas fa-trophy"></i> 히트랭킹 보기
+          </button>
         </div>
       </div>
       <div class="footer-bottom">
         <div class="footer-bottom-left">
-          <span>© 2025 히트분양(HIT분양). All rights reserved.</span>
+          <span>© 2025 히트분양(HITBUNYANG). All rights reserved.</span>
           <span>사업자등록번호: 000-00-00000</span>
           <span>대표: 홍길동</span>
         </div>
         <div class="footer-bottom-right">
           <a class="footer-link" href="#">이용약관</a>
           <a class="footer-link" href="#">개인정보처리방침</a>
-          <a class="footer-link" href="/faq" onclick="navigate('/faq');return false">광고문의</a>
+          <a class="footer-link" href="/ad-info" onclick="navigate('/ad-info');return false">광고문의</a>
         </div>
       </div>
     </div>
@@ -428,17 +542,20 @@ function renderFooter() {
 }
 
 // ============================================================
-// PROPERTY CARD
+// PROPERTY CARD (히트지수 포함)
 // ============================================================
 function renderPropertyCard(p, rank) {
+  const hitScore = calcHitScore(p);
   const badges = [];
-  if (p.ad_type === 'premium') badges.push('<span class="badge badge-premium-ad">★ 프리미엄</span>');
+  if (p.ad_type === 'hit') badges.push('<span class="badge badge-hit-ad">🔥 히트AD</span>');
+  else if (p.ad_type === 'premium') badges.push('<span class="badge badge-premium-ad">⭐ 프리미엄</span>');
+  else if (p.ad_type === 'standard') badges.push('<span class="badge badge-standard-ad">📌 스탠다드</span>');
   if (p.is_hot) badges.push('<span class="badge badge-hot">HOT</span>');
   if (p.is_new) badges.push('<span class="badge badge-new">NEW</span>');
   if (p.is_featured) badges.push('<span class="badge badge-featured">추천</span>');
   if (p.status === 'upcoming') badges.push('<span class="badge badge-upcoming">분양예정</span>');
   
-  const adClass = p.ad_type === 'premium' ? 'ad-premium' : p.ad_type === 'superior' ? 'ad-superior' : '';
+  const adClass = p.ad_type === 'hit' ? 'ad-hit' : p.ad_type === 'premium' ? 'ad-premium' : p.ad_type === 'standard' ? 'ad-standard' : '';
   const rankBadge = rank ? `<div class="rank-badge">${rank}</div>` : '';
   
   return `
@@ -447,11 +564,12 @@ function renderPropertyCard(p, rank) {
       ${rankBadge}
       <div class="card-badges">${badges.join('')}</div>
       <i class="fas fa-building placeholder-icon"></i>
+      <div class="card-hit-overlay">${renderHitGauge(hitScore)}</div>
     </div>
     <div class="card-body">
       <div class="card-tags">
         <span class="region-tag" style="background:${getRegionColor(p.region)}22;color:${getRegionColor(p.region)};border:1px solid ${getRegionColor(p.region)}44">
-          ${escapeHtml(p.region)}
+          <i class="fas fa-map-marker-alt" style="font-size:0.6rem"></i> ${escapeHtml(p.region)}
         </span>
         <span class="badge badge-gray">${getPropertyTypeLabel(p.property_type)}</span>
       </div>
@@ -466,10 +584,91 @@ function renderPropertyCard(p, rank) {
     </div>
     <div class="card-footer">
       <span><i class="fas fa-eye"></i> ${(p.view_count||0).toLocaleString()}</span>
-      <span><i class="fas fa-comment"></i> 상담 ${(p.inquiry_count||0).toLocaleString()}</span>
+      <span><i class="fas fa-comment"></i> ${(p.inquiry_count||0).toLocaleString()}</span>
       <span>${timeAgo(p.created_at)}</span>
     </div>
   </div>`;
+}
+
+// ============================================================
+// PLACEHOLDER PAGES (새 페이지 stub - 각 파일에서 override됨)
+// ============================================================
+function renderSitesPage(container) {
+  // app-sites.js에서 override
+  container.innerHTML = `<div class="loading-overlay"><div class="spinner"></div></div>`;
+  setTimeout(() => renderSitesPageContent(container), 0);
+}
+
+function renderHitmapPage(container) {
+  // app-hitmap.js에서 override
+  if (typeof renderHitmapPageContent === 'function') {
+    renderHitmapPageContent(container);
+  } else {
+    renderMapPage(container);
+  }
+}
+
+function renderRankingPage(container) {
+  if (typeof renderRankingPageContent === 'function') {
+    renderRankingPageContent(container);
+  } else {
+    _renderRankingFallback(container);
+  }
+}
+
+function renderMatchPage(container) {
+  renderCustomPage(container);
+}
+
+function renderCommunityPage(container) {
+  if (typeof renderCommunityPageContent === 'function') {
+    renderCommunityPageContent(container);
+  } else {
+    _renderCommunityFallback(container);
+  }
+}
+
+function renderTvPage(container) {
+  if (typeof renderTvPageContent === 'function') {
+    renderTvPageContent(container);
+  } else {
+    _renderTvFallback(container);
+  }
+}
+
+function renderAdInfoPage(container) {
+  if (typeof renderAdInfoPageContent === 'function') {
+    renderAdInfoPageContent(container);
+  } else {
+    _renderAdInfoFallback(container);
+  }
+}
+
+function renderSupportPage(container) {
+  renderFaqPage(container);
+}
+
+function renderAuthPage(container) {
+  renderLoginPage(container);
+}
+
+// ============================================================
+// FALLBACK RENDERS (before specific page files load)
+// ============================================================
+function _renderRankingFallback(container) {
+  container.innerHTML = `<div class="loading-overlay"><div class="spinner"></div></div>`;
+}
+
+function _renderCommunityFallback(container) {
+  container.innerHTML = `<div class="loading-overlay"><div class="spinner"></div></div>`;
+}
+
+function _renderTvFallback(container) {
+  container.innerHTML = `<div class="loading-overlay"><div class="spinner"></div></div>`;
+}
+
+function _renderAdInfoFallback(container) {
+  container.innerHTML = `<div class="loading-overlay"><div class="spinner"></div></div>`;
 }
 
 // ============================================================
@@ -479,7 +678,6 @@ document.addEventListener('DOMContentLoaded', () => {
   loadState();
   renderApp();
   
-  // Intercept all internal link clicks
   document.addEventListener('click', (e) => {
     const a = e.target.closest('a[href]');
     if (a && a.href && a.href.startsWith(location.origin) && !a.href.includes('#') && !a.target) {

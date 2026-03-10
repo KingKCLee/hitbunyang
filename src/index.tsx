@@ -237,6 +237,8 @@ function getHtmlTemplate(): string {
   <script src="/static/app-admin.js" defer></script>
   <script src="/static/app-map.js" defer></script>
   <script src="/static/app-pages.js" defer></script>
+  <script src="/static/app-sites.js" defer></script>
+  <script src="/static/app-ranking.js" defer></script>
 </body>
 </html>`
 }
