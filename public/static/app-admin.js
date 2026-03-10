@@ -858,22 +858,9 @@ window.closeModal = function() {
 };
 
 // ============================================================
-// INITIALIZE
+// INITIALIZE (app.js handles init via DOMContentLoaded)
 // ============================================================
-loadState();
-renderApp();
-
-// Handle links
-document.addEventListener('click', (e) => {
-  const a = e.target.closest('a[href]');
-  if (a && a.href.startsWith(location.origin) && !a.href.includes('#') && !a.target) {
-    const path = a.href.replace(location.origin, '');
-    if (!path.startsWith('/api') && !path.includes('.')) {
-      e.preventDefault();
-      navigate(path);
-    }
-  }
-});
+// Note: loadState() and renderApp() are called in app.js DOMContentLoaded
 
 // Initialize admin users if needed
 async function ensureAdminUser() {

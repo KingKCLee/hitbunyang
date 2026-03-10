@@ -53,6 +53,27 @@ app.get('/api/visitors', async (c) => {
   return c.json({ today: todayStat?.count || 0, stats: stats.results })
 })
 
+// Site stats API (total properties, jobs, members, etc.)
+app.get('/api/stats', async (c) => {
+  const [siteStats, regionStats, todayVisitors] = await Promise.all([
+    c.env.DB.prepare("SELECT stat_key, stat_value FROM site_stats").all(),
+    c.env.DB.prepare("SELECT region, property_count FROM region_stats ORDER BY property_count DESC").all(),
+    c.env.DB.prepare("SELECT count FROM visitor_stats WHERE date = ?")
+      .bind(new Date().toISOString().split('T')[0]).first() as Promise<any>,
+  ])
+  
+  const stats: any = {}
+  for (const row of (siteStats.results as any[])) {
+    stats[row.stat_key] = row.stat_value
+  }
+  
+  return c.json({
+    ...stats,
+    today_visitors: (todayVisitors as any)?.count || 0,
+    regions: regionStats.results
+  })
+})
+
 // Banners API
 app.get('/api/banners', async (c) => {
   const { position } = c.req.query()
@@ -75,11 +96,83 @@ app.post('/api/banners/:id/click', async (c) => {
   return c.json({ success: true })
 })
 
+// Properties near location (for map page)
+app.get('/api/properties/nearby', async (c) => {
+  const { lat, lng, radius = '5', limit = '20' } = c.req.query()
+  
+  if (!lat || !lng) {
+    return c.json({ error: '위치 정보가 필요합니다.' }, 400)
+  }
+  
+  const latF = parseFloat(lat)
+  const lngF = parseFloat(lng)
+  const radiusF = parseFloat(radius)
+  
+  // Haversine formula approximation using bounding box
+  const latDelta = radiusF / 111.0
+  const lngDelta = radiusF / (111.0 * Math.cos(latF * Math.PI / 180))
+  
+  const rows = await c.env.DB.prepare(
+    `SELECT p.*, 
+      (ABS(p.latitude - ?) * ABS(p.latitude - ?) + ABS(p.longitude - ?) * ABS(p.longitude - ?)) as dist_sq
+     FROM properties p
+     WHERE p.latitude BETWEEN ? AND ?
+       AND p.longitude BETWEEN ? AND ?
+       AND p.status != 'closed'
+       AND p.latitude IS NOT NULL
+     ORDER BY dist_sq ASC
+     LIMIT ?`
+  ).bind(
+    latF, latF, lngF, lngF,
+    latF - latDelta, latF + latDelta,
+    lngF - lngDelta, lngF + lngDelta,
+    parseInt(limit)
+  ).all()
+  
+  return c.json(rows.results)
+})
+
+// All properties with coordinates (for map display)
+app.get('/api/properties/map', async (c) => {
+  const { region, type } = c.req.query()
+  let where = ["p.latitude IS NOT NULL", "p.status != 'closed'"]
+  let params: any[] = []
+  
+  if (region && region !== 'all') { where.push('p.region = ?'); params.push(region) }
+  if (type && type !== 'all') { where.push('p.property_type = ?'); params.push(type) }
+  
+  const rows = await c.env.DB.prepare(
+    `SELECT id, title, property_type, region, address, price_min, price_max, 
+     latitude, longitude, is_hot, is_new, ad_type, view_count
+     FROM properties p WHERE ${where.join(' AND ')}
+     ORDER BY ad_type DESC, view_count DESC LIMIT 200`
+  ).bind(...params).all()
+  
+  return c.json(rows.results)
+})
+
+// Best properties (Top 10 by score)
+app.get('/api/properties/best', async (c) => {
+  const { days = '10', limit = '10' } = c.req.query()
+  const rows = await c.env.DB.prepare(
+    `SELECT *, (view_count * 1 + inquiry_count * 3 + share_count * 2) as score
+     FROM properties 
+     WHERE status != 'closed'
+     ORDER BY ad_type = 'premium' DESC, score DESC 
+     LIMIT ?`
+  ).bind(parseInt(limit)).all()
+  return c.json(rows.results)
+})
+
 // Main page data
 app.get('/api/home', async (c) => {
-  const [bestProperties, newProperties, featuredJobs, latestNews, banners] = await Promise.all([
+  const today = new Date().toISOString().split('T')[0]
+  
+  const [bestProperties, newProperties, featuredJobs, latestNews, banners, siteStats] = await Promise.all([
     c.env.DB.prepare(
-      "SELECT * FROM properties WHERE status != 'closed' ORDER BY (view_count + inquiry_count * 3) DESC LIMIT 6"
+      `SELECT *, (view_count + inquiry_count * 3 + COALESCE(share_count, 0) * 2) as score 
+       FROM properties WHERE status != 'closed' 
+       ORDER BY ad_type = 'premium' DESC, score DESC LIMIT 10`
     ).all(),
     c.env.DB.prepare(
       "SELECT * FROM properties WHERE status != 'closed' AND is_new = 1 ORDER BY created_at DESC LIMIT 8"
@@ -93,14 +186,23 @@ app.get('/api/home', async (c) => {
     c.env.DB.prepare(
       "SELECT * FROM banners WHERE is_active = 1 AND (expires_at IS NULL OR expires_at > CURRENT_TIMESTAMP) ORDER BY position, sort_order"
     ).all(),
+    c.env.DB.prepare(
+      "SELECT stat_key, stat_value FROM site_stats"
+    ).all(),
   ])
+  
+  const stats: any = {}
+  for (const row of (siteStats.results as any[])) {
+    stats[(row as any).stat_key] = (row as any).stat_value
+  }
   
   return c.json({
     bestProperties: bestProperties.results,
     newProperties: newProperties.results,
     featuredJobs: featuredJobs.results,
     latestNews: latestNews.results,
-    banners: banners.results
+    banners: banners.results,
+    stats
   })
 })
 
@@ -114,9 +216,10 @@ function getHtmlTemplate(): string {
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
   <title>분양라인 - 부동산 분양 정보 플랫폼</title>
   <meta name="description" content="전국 분양 현장 정보와 분양 구인 정보를 한곳에서! 아파트, 오피스텔, 상가 분양 정보 제공">
+  <meta name="theme-color" content="#1e40af">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
   <link rel="stylesheet" href="/static/styles.css">
@@ -129,6 +232,8 @@ function getHtmlTemplate(): string {
   <script src="/static/app-properties.js" defer></script>
   <script src="/static/app-jobs.js" defer></script>
   <script src="/static/app-admin.js" defer></script>
+  <script src="/static/app-map.js" defer></script>
+  <script src="/static/app-pages.js" defer></script>
 </body>
 </html>`
 }

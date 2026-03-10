@@ -8,10 +8,16 @@ inquiries.use('*', authMiddleware);
 // 문의 등록
 inquiries.post('/', async (c) => {
   const body = await c.req.json();
-  const { property_id, job_post_id, inquiry_type, name, phone, email, message } = body;
+  const { property_id, job_post_id, inquiry_type, name, phone, email, message, 
+          contact_phone, contact_email, subject } = body;
   
-  if (!name || !phone || !message) {
-    return c.json({ error: '이름, 연락처, 문의 내용을 입력해주세요.' }, 400);
+  const actualName = name;
+  const actualPhone = phone || contact_phone;
+  const actualEmail = email || contact_email;
+  const actualMessage = message || subject;
+  
+  if (!actualName || !actualMessage) {
+    return c.json({ error: '이름과 문의 내용을 입력해주세요.' }, 400);
   }
   
   const userId = c.get('userId');
@@ -20,7 +26,7 @@ inquiries.post('/', async (c) => {
     `INSERT INTO inquiries (property_id, job_post_id, inquiry_type, name, phone, email, message, user_id)
      VALUES (?,?,?,?,?,?,?,?)`
   ).bind(property_id||null, job_post_id||null, inquiry_type||'general', 
-    name, phone, email||null, message, userId||null).run();
+    actualName, actualPhone||null, actualEmail||null, actualMessage, userId||null).run();
   
   // 문의수 증가 (분양 현장인 경우)
   if (property_id) {
