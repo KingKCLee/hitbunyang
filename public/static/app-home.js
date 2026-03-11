@@ -1,12 +1,6 @@
-// 히트분양 - 홈페이지 v5 (다방 톤앤매너 리뉴얼)
-// A: 히어로 (네이비 그라디언트 + 검색 + 지역칩)
-// B: 카테고리 그리드 (다방 메인 스타일)
-// C: 히트 TOP 5
-// D: 배너 슬라이더 (히트AD)
-// E: 통계 위젯
-// F: 신규 등록 단지
-// G: 히트맵 + TV 미니 위젯
-// H: 뉴스 + 커뮤니티 + 채용
+// 히트분양 - 홈페이지 v6 (분양라인 스타일 전면 개편)
+// 첫화면 = 광고등급별 구인공고 목록 (프리미엄→슈페리어→베이직→일반)
+// 각 카드에 상세 구인정보 (수수료, 일비, 시행사 등) 표시
 
 // ============================================================
 // HOME PAGE
@@ -36,7 +30,10 @@ async function renderHomePage(container) {
     return;
   }
   
-  const { bestProperties, newProperties, featuredJobs, latestNews, banners, stats } = homeRes.data;
+  const { bestProperties, newProperties, featuredJobs,
+          premiumJobs, superiorJobs, basicJobs, normalJobs,
+          latestNews, banners, stats } = homeRes.data;
+  
   const topBanners = (banners || []).filter(b => b.position === 'top');
   
   document.getElementById('home-content').innerHTML = `
@@ -46,14 +43,13 @@ async function renderHomePage(container) {
         ${renderCategoryGrid()}
       </div>
     </div>
+
+    <!-- ★ 핵심: 광고등급별 구인공고 목록 (분양라인 스타일) -->
+    ${renderAdJobsSection(premiumJobs || [], superiorJobs || [], basicJobs || [], normalJobs || [])}
+
     <!-- 히트 TOP 5 -->
     ${renderHitTop5(bestProperties)}
-    <!-- 배너 슬라이더 -->
-    <div class="home-section" style="background:#f4f8ff;padding:2rem 0">
-      <div class="container">
-        ${renderBannerSlider(topBanners)}
-      </div>
-    </div>
+
     <!-- 통계 위젯 -->
     <div class="container" style="padding-top:2rem;padding-bottom:1rem">
       ${renderStatsWidget(stats, visitorRes.data?.today || 0)}
@@ -89,8 +85,6 @@ async function renderHomePage(container) {
     const el = document.getElementById(id);
     if (el) animateNumber(el, val, 1800);
   });
-  
-  initBannerSlider();
 }
 
 // ============================================================
@@ -120,7 +114,7 @@ function renderHeroSection() {
           <!-- 타이틀 -->
           <h1 style="font-size:2.4rem;font-weight:900;color:white;line-height:1.25;letter-spacing:-1.5px;margin-bottom:0.75rem">
             전국 신규 분양단지<br>
-            <span style="color:#90caf9">히트지수</span>로 한눈에!
+            <span style="color:#90caf9">구인정보</span>를 한눈에!
           </h1>
           <p style="font-size:1rem;color:rgba(255,255,255,0.75);margin-bottom:1.75rem;font-weight:400">
             아파트 · 오피스텔 · 상가 분양 | 팀장 · 팀원 채용
@@ -217,7 +211,6 @@ function renderHeroSection() {
     @media(max-width:768px){
       .hero-section .container > div { grid-template-columns:1fr!important; }
       .hero-section .container > div > div:last-child { display:none!important; }
-      h1.hero-h1 { font-size:1.8rem!important; }
     }
   </style>`;
 }
@@ -234,7 +227,7 @@ function doHeroSearch() {
 window.doHeroSearch = doHeroSearch;
 
 // ============================================================
-// 카테고리 그리드 — 다방 메인 스타일
+// 카테고리 그리드
 // ============================================================
 function renderCategoryGrid() {
   const cats = [
@@ -275,6 +268,196 @@ function renderCategoryGrid() {
 }
 
 // ============================================================
+// ★ 핵심: 광고등급별 구인공고 목록 (분양라인 메인 스타일)
+// ============================================================
+function renderAdJobsSection(premiumJobs, superiorJobs, basicJobs, normalJobs) {
+  const allSections = [];
+
+  // 프리미엄
+  if (premiumJobs.length > 0) {
+    allSections.push(renderAdTierSection(
+      '★ 프리미엄 현장',
+      '분양 수수료 최상위 현장',
+      premiumJobs,
+      { bg: 'linear-gradient(135deg,#fff8e1,#fffde7)', border: '#ffd54f', badgeColor: '#f57f17',
+        headerBg: 'linear-gradient(90deg,#f57f17,#ff6f00)', dot: '#f9a825', tier: 'premium' }
+    ));
+  }
+  // 슈페리어
+  if (superiorJobs.length > 0) {
+    allSections.push(renderAdTierSection(
+      '◆ 슈페리어 현장',
+      '검증된 우량 분양 현장',
+      superiorJobs,
+      { bg: 'linear-gradient(135deg,#f3e5f5,#fce4ec)', border: '#ce93d8', badgeColor: '#6a1b9a',
+        headerBg: 'linear-gradient(90deg,#6a1b9a,#8e24aa)', dot: '#ab47bc', tier: 'superior' }
+    ));
+  }
+  // 베이직
+  if (basicJobs.length > 0) {
+    allSections.push(renderAdTierSection(
+      '◎ 베이직 현장',
+      '안정적인 분양 현장',
+      basicJobs,
+      { bg: 'linear-gradient(135deg,#e8f5e9,#f1f8e9)', border: '#a5d6a7', badgeColor: '#2e7d32',
+        headerBg: 'linear-gradient(90deg,#2e7d32,#388e3c)', dot: '#66bb6a', tier: 'basic' }
+    ));
+  }
+  // 일반 (AD 미등록)
+  if (normalJobs.length > 0) {
+    allSections.push(renderAdTierSection(
+      'AD 분양 현장',
+      '분양현장 구인공고',
+      normalJobs,
+      { bg: '#f8fafc', border: '#d1d5db', badgeColor: '#4b5563',
+        headerBg: 'linear-gradient(90deg,#374151,#4b5563)', dot: '#9ca3af', tier: 'normal' }
+    ));
+  }
+
+  if (allSections.length === 0) return '';
+
+  return `
+  <div style="background:#f4f8ff;padding:2rem 0 2.5rem">
+    <div class="container">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem">
+        <div>
+          <h2 style="font-size:1.3rem;font-weight:900;color:#0e1f40;margin-bottom:0.25rem">
+            💼 분양현장 구인공고
+          </h2>
+          <p style="font-size:0.82rem;color:#6b7280">광고 등급순 · 각 현장의 수수료·일비·담당자 정보를 바로 확인하세요</p>
+        </div>
+        <a onclick="navigate('/sites?tab=jobs');return false" href="/sites?tab=jobs"
+          style="font-size:0.82rem;color:#1c7cff;font-weight:700;text-decoration:none;
+            display:flex;align-items:center;gap:0.3rem;white-space:nowrap">
+          전체 공고 <i class="fas fa-chevron-right"></i>
+        </a>
+      </div>
+      ${allSections.join('')}
+    </div>
+  </div>`;
+}
+
+function renderAdTierSection(title, subtitle, jobs, style) {
+  const { bg, border, badgeColor, headerBg, dot, tier } = style;
+  const showCount = tier === 'normal' ? 6 : jobs.length; // 일반은 6개만, 나머지 전부
+  const visibleJobs = jobs.slice(0, showCount);
+  const hasMore = jobs.length > showCount;
+
+  return `
+  <div style="margin-bottom:1.5rem">
+    <!-- 섹션 헤더 -->
+    <div style="background:${headerBg};border-radius:12px 12px 0 0;padding:0.75rem 1.25rem;
+      display:flex;align-items:center;justify-content:space-between">
+      <div style="display:flex;align-items:center;gap:0.6rem">
+        <span style="width:8px;height:8px;border-radius:50%;background:white;
+          box-shadow:0 0 6px rgba(255,255,255,0.8);display:inline-block"></span>
+        <span style="font-weight:800;color:white;font-size:0.95rem">${title}</span>
+        <span style="font-size:0.75rem;color:rgba(255,255,255,0.7)">${subtitle}</span>
+        <span style="background:rgba(255,255,255,0.2);color:white;font-size:0.72rem;
+          padding:1px 8px;border-radius:10px;font-weight:700">${jobs.length}건</span>
+      </div>
+      <a onclick="navigate('/sites?tab=jobs');return false" href="/sites?tab=jobs"
+        style="color:rgba(255,255,255,0.85);font-size:0.78rem;text-decoration:none;font-weight:600">
+        더보기 <i class="fas fa-chevron-right"></i>
+      </a>
+    </div>
+    <!-- 카드 목록 -->
+    <div style="background:${bg};border:1px solid ${border};border-top:none;border-radius:0 0 12px 12px;padding:0.75rem">
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:0.75rem">
+        ${visibleJobs.map(j => renderHomeJobCard(j, badgeColor)).join('')}
+      </div>
+      ${hasMore ? `
+      <div style="text-align:center;margin-top:0.75rem">
+        <button onclick="navigate('/sites?tab=jobs')"
+          style="background:white;border:1px solid ${border};color:${badgeColor};
+            padding:0.5rem 1.5rem;border-radius:8px;font-size:0.82rem;font-weight:700;
+            cursor:pointer;font-family:inherit">
+          + ${jobs.length - showCount}개 더보기
+        </button>
+      </div>` : ''}
+    </div>
+  </div>`;
+}
+
+// 홈 구인공고 카드 (분양라인 스타일 — 상세정보 표시)
+function renderHomeJobCard(j, accentColor) {
+  const badges = [];
+  if (j.ad_type === 'premium') badges.push(`<span style="background:#fff8e1;color:#f57f17;border:1px solid #ffe082;font-size:0.65rem;font-weight:800;padding:1px 6px;border-radius:3px">★ 프리미엄</span>`);
+  else if (j.ad_type === 'superior') badges.push(`<span style="background:#f3e5f5;color:#6a1b9a;border:1px solid #ce93d8;font-size:0.65rem;font-weight:800;padding:1px 6px;border-radius:3px">◆ 슈페리어</span>`);
+  else if (j.ad_type === 'basic') badges.push(`<span style="background:#e8f5e9;color:#2e7d32;border:1px solid #a5d6a7;font-size:0.65rem;font-weight:800;padding:1px 6px;border-radius:3px">◎ 베이직</span>`);
+  if (j.is_urgent) badges.push(`<span style="background:#ffebee;color:#c62828;border:1px solid #ffcdd2;font-size:0.65rem;font-weight:800;padding:1px 6px;border-radius:3px">🚨 급구</span>`);
+  if (j.is_hot)    badges.push(`<span style="background:#fff3e0;color:#e65100;border:1px solid #ffcc80;font-size:0.65rem;font-weight:800;padding:1px 6px;border-radius:3px">🔥 HOT</span>`);
+  if (j.is_best)   badges.push(`<span style="background:#e8f5e9;color:#1b5e20;border:1px solid #a5d6a7;font-size:0.65rem;font-weight:800;padding:1px 6px;border-radius:3px">💰 대박</span>`);
+
+  // 급여 정보 태그
+  const payTags = [];
+  if (j.commission_rate)  payTags.push(`<span style="background:#fff8e1;color:#f57f17;border:1px solid #ffe082;font-size:0.72rem;font-weight:700;padding:2px 8px;border-radius:4px">수수료 ${j.commission_rate}%</span>`);
+  if (j.daily_pay > 0)    payTags.push(`<span style="background:#e8f5e9;color:#2e7d32;border:1px solid #a5d6a7;font-size:0.72rem;font-weight:700;padding:2px 8px;border-radius:4px">일비 ${Number(j.daily_pay).toLocaleString()}원</span>`);
+  if (j.accommodation_pay > 0) payTags.push(`<span style="background:#e3f2fd;color:#0d47a1;border:1px solid #90caf9;font-size:0.72rem;font-weight:700;padding:2px 8px;border-radius:4px">숙소비 ${Number(j.accommodation_pay).toLocaleString()}원</span>`);
+
+  // commission_note에서 핵심 수수료 정보 추출 (첫 줄)
+  const commNote = j.commission_note ? j.commission_note.split('\n')[0].trim() : '';
+
+  return `
+  <div onclick="navigate('/jobs/${j.id}')"
+    style="background:white;border-radius:10px;border:1px solid #e5e7eb;padding:0.9rem 1rem;
+      cursor:pointer;transition:all 0.18s;box-shadow:0 1px 4px rgba(0,0,0,0.05)"
+    onmouseover="this.style.borderColor='#93c5fd';this.style.boxShadow='0 4px 16px rgba(28,124,255,0.12)';this.style.transform='translateY(-2px)'"
+    onmouseout="this.style.borderColor='#e5e7eb';this.style.boxShadow='0 1px 4px rgba(0,0,0,0.05)';this.style.transform='translateY(0)'">
+    
+    <!-- 상단: 배지 + 제목 -->
+    <div style="margin-bottom:0.5rem">
+      ${badges.length ? `<div style="display:flex;gap:0.3rem;flex-wrap:wrap;margin-bottom:0.4rem">${badges.join('')}</div>` : ''}
+      <div style="font-size:0.92rem;font-weight:800;color:#111827;line-height:1.35;
+        overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">
+        ${escapeHtml(j.title)}
+      </div>
+    </div>
+
+    <!-- 현장명 + 지역 -->
+    <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.5rem;flex-wrap:wrap">
+      <span style="font-size:0.8rem;font-weight:700;color:#1e40af">
+        <i class="fas fa-building" style="font-size:0.72rem"></i> ${escapeHtml(j.site_name || '-')}
+      </span>
+      <span style="font-size:0.75rem;color:#6b7280">
+        <i class="fas fa-map-marker-alt" style="color:#ef4444;font-size:0.7rem"></i> ${escapeHtml(j.region)}
+      </span>
+      <span style="font-size:0.75rem;color:#6b7280">
+        <i class="fas fa-users" style="color:#10b981;font-size:0.7rem"></i> ${getRankLabel(j.rank_type)}
+      </span>
+    </div>
+
+    <!-- 수수료 + 급여 태그 -->
+    ${payTags.length ? `<div style="display:flex;flex-wrap:wrap;gap:0.3rem;margin-bottom:0.5rem">${payTags.join('')}</div>` : ''}
+
+    <!-- 수수료 노트 요약 (있을 때만) -->
+    ${commNote ? `<div style="font-size:0.78rem;color:#92400e;background:#fef9c3;border-radius:5px;
+      padding:0.3rem 0.6rem;margin-bottom:0.5rem;line-height:1.4;
+      overflow:hidden;white-space:nowrap;text-overflow:ellipsis">
+      💰 ${escapeHtml(commNote)}
+    </div>` : ''}
+
+    <!-- 구분선 + 사업자 정보 -->
+    ${(j.enforcement_company || j.construction_company || j.agency_company) ? `
+    <div style="border-top:1px solid #f3f4f6;padding-top:0.4rem;margin-top:0.4rem;
+      font-size:0.74rem;color:#6b7280;display:flex;flex-wrap:wrap;gap:0.4rem">
+      ${j.enforcement_company ? `<span><i class="fas fa-hammer" style="color:#9ca3af"></i> 시행 ${escapeHtml(j.enforcement_company)}</span>` : ''}
+      ${j.construction_company ? `<span><i class="fas fa-hard-hat" style="color:#9ca3af"></i> 시공 ${escapeHtml(j.construction_company)}</span>` : ''}
+      ${j.agency_company ? `<span><i class="fas fa-handshake" style="color:#9ca3af"></i> 대행 ${escapeHtml(j.agency_company)}</span>` : ''}
+    </div>` : ''}
+
+    <!-- 하단: 담당자 + 시간 -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:0.5rem;flex-wrap:wrap;gap:0.25rem">
+      <div style="font-size:0.76rem;color:#374151;font-weight:600">
+        <i class="fas fa-phone" style="color:#1e40af;font-size:0.68rem"></i>
+        ${escapeHtml(j.contact_name)} ${escapeHtml(j.contact_phone)}
+      </div>
+      <div style="font-size:0.71rem;color:#9ca3af">${timeAgo(j.created_at)}</div>
+    </div>
+  </div>`;
+}
+
+// ============================================================
 // B: 히트 TOP 5
 // ============================================================
 function renderHitTop5(properties) {
@@ -308,17 +491,14 @@ function renderHitTop5Card(p, rank) {
       ${rank === 0 ? 'border-color:#1c7cff;box-shadow:0 4px 20px rgba(26,35,126,0.15)' : ''}"
     onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 28px rgba(28,124,255,0.18)'"
     onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='${rank===0?'0 4px 20px rgba(26,35,126,0.15)':'0 2px 8px rgba(28,124,255,0.08)'}'">
-    <!-- 이미지 영역 -->
     <div style="height:120px;background:${getPropertyBgImage(p.property_type)};
       display:flex;align-items:center;justify-content:center;position:relative">
       <i class="fas fa-building" style="color:rgba(255,255,255,0.45);font-size:2rem"></i>
-      <!-- 순위 배지 -->
       <div style="position:absolute;top:8px;left:8px;background:rgba(0,0,0,0.5);
         color:${rank<3?'#ffd54f':'white'};font-size:${rank<3?'1.1':'0.8'}rem;
         font-weight:800;padding:3px 8px;border-radius:6px">
         ${rankMedals[rank]}
       </div>
-      <!-- 히트지수 서클 -->
       <div style="position:absolute;top:8px;right:8px">
         <div style="position:relative;width:38px;height:38px">
           <svg viewBox="0 0 36 36" style="width:100%;height:100%;transform:rotate(-90deg)">
@@ -344,7 +524,6 @@ function renderHitTop5Card(p, rank) {
       <div style="font-size:0.9rem;font-weight:900;color:#1c7cff;margin-bottom:0.5rem">
         ${formatPriceRange(p.price_min, p.price_max)}
       </div>
-      <!-- 히트지수 바 -->
       <div style="display:flex;align-items:center;gap:6px">
         <div style="flex:1;height:4px;background:#d6e4ff;border-radius:2px;overflow:hidden">
           <div style="height:100%;width:${score}%;background:${color};border-radius:2px;
@@ -355,119 +534,6 @@ function renderHitTop5Card(p, rank) {
     </div>
   </div>`;
 }
-
-// ============================================================
-// BANNER SLIDER
-// ============================================================
-let bannerTimer = null;
-let currentBannerIndex = 0;
-let totalBanners = 0;
-
-const BANNER_COLORS = [
-  'linear-gradient(135deg, #1c7cff 0%, #0057d9 100%)',
-  'linear-gradient(135deg, #0057d9 0%, #0042b0 100%)',
-  'linear-gradient(135deg, #004d40 0%, #00897b 100%)',
-  'linear-gradient(135deg, #4a148c 0%, #7b1fa2 100%)',
-  'linear-gradient(135deg, #b71c1c 0%, #e53935 100%)',
-  'linear-gradient(135deg, #e65100 0%, #f4511e 100%)',
-  'linear-gradient(135deg, #006064 0%, #0097a7 100%)',
-  'linear-gradient(135deg, #1b5e20 0%, #388e3c 100%)',
-  'linear-gradient(135deg, #311b92 0%, #512da8 100%)',
-  'linear-gradient(135deg, #bf360c 0%, #f4511e 100%)',
-];
-
-function renderBannerSlider(banners) {
-  const items = banners && banners.length >= 3 ? banners : getDemoBanners();
-  totalBanners = items.length;
-  
-  const slides = items.map((b, i) => {
-    const bg = BANNER_COLORS[i % BANNER_COLORS.length];
-    return `
-    <div class="banner-slide" style="background:${bg}" onclick="navigate('${escapeHtml(b.link_url || '/sites')}')">
-      <div class="banner-slide-content">
-        ${b.badge_text ? `<div class="banner-slide-badge">${escapeHtml(b.badge_text)}</div>` : ''}
-        <div class="banner-slide-title">${escapeHtml(b.title)}</div>
-        ${b.subtitle ? `<div class="banner-slide-subtitle">${escapeHtml(b.subtitle)}</div>` : ''}
-      </div>
-      <button class="banner-slide-arrow">자세히 보기 →</button>
-    </div>`;
-  }).join('');
-  
-  const dots = items.map((_, i) => 
-    `<button class="banner-dot ${i===0?'active':''}" onclick="goToBanner(${i})"></button>`
-  ).join('');
-  
-  return `
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
-    <h2 class="section-title">📢 히트AD 현장</h2>
-    <a class="section-link" href="/sites?sort=hot" onclick="navigate('/sites?sort=hot');return false">
-      전체보기 <i class="fas fa-chevron-right"></i>
-    </a>
-  </div>
-  <div class="banner-slider-wrap" id="banner-slider-wrap">
-    <div class="banner-slides" id="banner-slides">${slides}</div>
-    <button class="banner-prev" onclick="prevBanner()">‹</button>
-    <button class="banner-next" onclick="nextBanner()">›</button>
-    <div class="banner-controls">${dots}</div>
-    <div class="banner-counter" id="banner-counter">1 / ${totalBanners}</div>
-  </div>`;
-}
-
-function getDemoBanners() {
-  return [
-    { title: '힐스테이트 판교역 퍼스트', subtitle: '판교 중심 프리미엄 아파트 분양', badge_text: '🔥 히트AD', link_url: '/sites' },
-    { title: '래미안 원펜타스', subtitle: '서초구 반포동 한강뷰 랜드마크', badge_text: '⭐ 프리미엄', link_url: '/sites' },
-    { title: 'DMC SK뷰아이파크', subtitle: '수도권 광역교통 핵심 요지', badge_text: '📌 스탠다드', link_url: '/sites' },
-    { title: '더샵 퍼스트파크 하남', subtitle: '경기 하남 친환경 주거단지', badge_text: '🔥 HOT', link_url: '/sites' },
-    { title: '롯데캐슬 시그니처', subtitle: '인천 송도 국제업무지구', badge_text: '특별공급', link_url: '/sites' },
-    { title: '광교 아이파크', subtitle: '수원 광교 신도시 프리미엄', badge_text: '잔여세대', link_url: '/sites' },
-    { title: '힐스테이트 용인 둔전역', subtitle: '용인시 처인구 역세권 아파트', badge_text: 'NEW', link_url: '/sites' },
-    { title: '포레나 부산 두구동', subtitle: '부산 기장 해운대 근접 단지', badge_text: 'NEW', link_url: '/sites' },
-    { title: '자이 더 엘리언트', subtitle: '강남 청담 럭셔리 오피스텔', badge_text: '⭐ 프리미엄', link_url: '/sites' },
-    { title: 'SK뷰 위례신도시', subtitle: '위례신도시 역세권 대단지', badge_text: 'BEST', link_url: '/sites' },
-  ];
-}
-
-function initBannerSlider() {
-  if (bannerTimer) clearInterval(bannerTimer);
-  bannerTimer = setInterval(() => nextBanner(false), 4500);
-  const wrap = document.getElementById('banner-slider-wrap');
-  if (!wrap) return;
-  let startX = 0;
-  wrap.addEventListener('touchstart', (e) => { startX = e.touches[0].clientX; }, { passive: true });
-  wrap.addEventListener('touchend', (e) => {
-    const dx = e.changedTouches[0].clientX - startX;
-    if (dx > 50) prevBanner();
-    else if (dx < -50) nextBanner();
-  }, { passive: true });
-  wrap.addEventListener('mouseenter', () => clearInterval(bannerTimer));
-  wrap.addEventListener('mouseleave', () => {
-    bannerTimer = setInterval(() => nextBanner(false), 4500);
-  });
-}
-
-function goToBanner(idx) { currentBannerIndex = idx; updateBannerSlider(); }
-function nextBanner(reset = true) {
-  currentBannerIndex = (currentBannerIndex + 1) % totalBanners;
-  updateBannerSlider();
-  if (reset) { clearInterval(bannerTimer); bannerTimer = setInterval(() => nextBanner(false), 4500); }
-}
-function prevBanner() {
-  currentBannerIndex = (currentBannerIndex - 1 + totalBanners) % totalBanners;
-  updateBannerSlider();
-  clearInterval(bannerTimer); bannerTimer = setInterval(() => nextBanner(false), 4500);
-}
-function updateBannerSlider() {
-  const slides = document.getElementById('banner-slides');
-  if (slides) slides.style.transform = `translateX(-${currentBannerIndex * 100}%)`;
-  document.querySelectorAll('.banner-dot').forEach((d, i) => d.classList.toggle('active', i === currentBannerIndex));
-  const counter = document.getElementById('banner-counter');
-  if (counter) counter.textContent = `${currentBannerIndex + 1} / ${totalBanners}`;
-}
-
-window.goToBanner = goToBanner;
-window.nextBanner = nextBanner;
-window.prevBanner = prevBanner;
 
 // ============================================================
 // STATS WIDGET
@@ -494,7 +560,7 @@ function renderStatsWidget(stats, todayVisitors) {
 }
 
 // ============================================================
-// D: NEW PROPERTIES
+// NEW PROPERTIES
 // ============================================================
 function renderNewProperties(properties) {
   if (!properties || !properties.length) return '';
@@ -507,20 +573,14 @@ function renderNewProperties(properties) {
     ${properties.slice(0,8).map(p => renderPropertyCard(p)).join('')}
   </div>
   <style>
-    @media(max-width:1024px){
-      .properties-grid-home { grid-template-columns:repeat(3,1fr)!important; }
-    }
-    @media(max-width:768px){
-      .properties-grid-home { grid-template-columns:repeat(2,1fr)!important; }
-    }
-    @media(max-width:480px){
-      .properties-grid-home { grid-template-columns:1fr!important; }
-    }
+    @media(max-width:1024px){ .properties-grid-home { grid-template-columns:repeat(3,1fr)!important; } }
+    @media(max-width:768px){ .properties-grid-home { grid-template-columns:repeat(2,1fr)!important; } }
+    @media(max-width:480px){ .properties-grid-home { grid-template-columns:1fr!important; } }
   </style>`;
 }
 
 // ============================================================
-// E: 미니 위젯 (히트맵 + TV)
+// 미니 위젯 (히트맵 + TV)
 // ============================================================
 function renderHomeMiniWidgets() {
   return `
@@ -528,33 +588,27 @@ function renderHomeMiniWidgets() {
     <h2 class="section-title">🗺️ 히트맵 & 📺 히트TV</h2>
   </div>
   <div style="display:grid;grid-template-columns:3fr 2fr;gap:1rem">
-    <!-- 히트맵 위젯 -->
     <div onclick="navigate('/hitmap')"
       style="background:linear-gradient(135deg,#1c7cff,#0057d9);border-radius:16px;
         padding:1.5rem;cursor:pointer;transition:transform 0.2s;min-height:200px;
         display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden"
       onmouseover="this.style.transform='translateY(-3px)'"
       onmouseout="this.style.transform='translateY(0)'">
-      <!-- 배경 패턴 -->
       <div style="position:absolute;inset:0;opacity:0.06">
         ${Array.from({length:10}, (_,i) => `
           <div style="position:absolute;border-radius:50%;background:white;
-            width:${[60,40,80,30,50,70,45,35,55,65][i]}px;
-            height:${[60,40,80,30,50,70,45,35,55,65][i]}px;
-            top:${[10,40,20,60,80,5,55,75,35,50][i]}%;
-            left:${[15,60,80,20,45,70,35,85,55,10][i]}%"></div>
+            width:${[60,40,80,30,50,70,45,35,55,65][i]}px;height:${[60,40,80,30,50,70,45,35,55,65][i]}px;
+            top:${[10,40,20,60,80,5,55,75,35,50][i]}%;left:${[15,60,80,20,45,70,35,85,55,10][i]}%"></div>
         `).join('')}
       </div>
       <div style="position:relative;z-index:1">
         <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.75rem">
-          <span style="background:rgba(255,255,255,0.15);border-radius:10px;padding:0.5rem 0.75rem;
-            font-size:1.2rem">🗺️</span>
+          <span style="background:rgba(255,255,255,0.15);border-radius:10px;padding:0.5rem 0.75rem;font-size:1.2rem">🗺️</span>
           <div>
             <div style="font-size:1rem;font-weight:800;color:white">히트맵</div>
             <div style="font-size:0.78rem;color:rgba(255,255,255,0.65)">지역별 히트지수 시각화</div>
           </div>
         </div>
-        <!-- 가상 마커 -->
         <div style="position:relative;height:80px;background:rgba(255,255,255,0.07);
           border-radius:10px;overflow:hidden;margin-bottom:0.75rem">
           ${[
@@ -577,7 +631,6 @@ function renderHomeMiniWidgets() {
       </button>
     </div>
     
-    <!-- 히트TV 위젯 -->
     <div onclick="navigate('/tv')"
       style="background:white;border-radius:16px;border:1.5px solid #d6e4ff;
         padding:1.25rem;cursor:pointer;transition:all 0.2s;box-shadow:0 2px 8px rgba(28,124,255,0.08)"
@@ -595,8 +648,7 @@ function renderHomeMiniWidgets() {
         {title:'2025 수도권 분양시장 전망 분석', views:'8.9만'},
         {title:'분양 팀장 되는 법 A to Z', views:'6.2만'},
       ].map(v => `
-        <div style="display:flex;align-items:center;gap:0.65rem;padding:0.55rem 0;
-          border-bottom:1px solid #eaf2ff">
+        <div style="display:flex;align-items:center;gap:0.65rem;padding:0.55rem 0;border-bottom:1px solid #eaf2ff">
           <div style="width:42px;height:32px;background:#ffebee;border-radius:6px;
             display:flex;align-items:center;justify-content:center;flex-shrink:0">
             <i class="fab fa-youtube" style="color:#e53935;font-size:0.9rem"></i>
@@ -604,16 +656,13 @@ function renderHomeMiniWidgets() {
           <div style="flex:1;overflow:hidden">
             <div style="font-size:0.8rem;font-weight:600;overflow:hidden;white-space:nowrap;
               text-overflow:ellipsis;color:#0e1f40">${v.title}</div>
-            <div style="font-size:0.71rem;color:#8fa3c8;margin-top:1px">
-              <i class="fas fa-eye"></i> ${v.views}
-            </div>
+            <div style="font-size:0.71rem;color:#8fa3c8;margin-top:1px"><i class="fas fa-eye"></i> ${v.views}</div>
           </div>
         </div>
       `).join('')}
       <div style="text-align:center;margin-top:0.75rem">
         <button style="background:#ffebee;color:#e53935;border:1.5px solid #ffcdd2;
-          padding:0.45rem 1.2rem;border-radius:8px;font-size:0.82rem;font-weight:700;
-          cursor:pointer;font-family:inherit">
+          padding:0.45rem 1.2rem;border-radius:8px;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit">
           <i class="fab fa-youtube"></i> 채널 방문하기
         </button>
       </div>
@@ -622,7 +671,7 @@ function renderHomeMiniWidgets() {
 }
 
 // ============================================================
-// F: 뉴스 + 커뮤니티 + 채용
+// 뉴스 + 커뮤니티 + 채용 (하단)
 // ============================================================
 function renderHomeBottomSection(newsList, jobs) {
   return `
@@ -643,8 +692,7 @@ function renderHomeBottomSection(newsList, jobs) {
               <span style="font-size:0.72rem;color:#8fa3c8;white-space:nowrap">${timeAgo(n.created_at)}</span>
             </div>`).join('')
           : `<div style="text-align:center;padding:2.5rem;color:#8fa3c8;font-size:0.85rem">
-              <div style="font-size:2rem;margin-bottom:0.5rem">📋</div>
-              공지사항이 없습니다
+              <div style="font-size:2rem;margin-bottom:0.5rem">📋</div>공지사항이 없습니다
             </div>`
         }
       </div>
@@ -664,8 +712,7 @@ function renderHomeBottomSection(newsList, jobs) {
           {cat:'Q&A', catColor:'#c62828', catBg:'#ffebee', title:'계약금 환급 조건이 어떻게 되나요?', likes:12, comments:6},
         ].map(p => `
           <div onclick="navigate('/community')"
-            style="padding:0.8rem 1rem;border-bottom:1px solid #eaf2ff;cursor:pointer;
-              transition:background 0.15s"
+            style="padding:0.8rem 1rem;border-bottom:1px solid #eaf2ff;cursor:pointer;transition:background 0.15s"
             onmouseover="this.style.background='#f4f8ff'"
             onmouseout="this.style.background='white'">
             <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.3rem">
@@ -683,7 +730,7 @@ function renderHomeBottomSection(newsList, jobs) {
       </div>
     </div>
     
-    <!-- 채용 -->
+    <!-- 최신 채용 -->
     <div>
       <div class="section-header">
         <h2 class="section-title">🔥 HOT 채용</h2>
@@ -695,7 +742,7 @@ function renderHomeBottomSection(newsList, jobs) {
             <div style="font-size:2rem;margin-bottom:0.5rem">💼</div>채용 공고가 없습니다
           </div>`
         : `<div style="display:flex;flex-direction:column;gap:0.5rem">
-            ${jobs.map(j => renderJobCardMini(j)).join('')}
+            ${jobs.slice(0,5).map(j => renderJobCardMini(j)).join('')}
            </div>`
       }
     </div>
@@ -705,8 +752,8 @@ function renderHomeBottomSection(newsList, jobs) {
 function renderJobCardMini(job) {
   const badges = [];
   if (job.is_urgent) badges.push('<span class="badge badge-urgent">급구</span>');
-  if (job.is_hot) badges.push('<span class="badge badge-hot">HOT</span>');
-  if (job.is_best) badges.push('<span class="badge badge-best">대박</span>');
+  if (job.is_hot)    badges.push('<span class="badge badge-hot">HOT</span>');
+  if (job.is_best)   badges.push('<span class="badge badge-best">대박</span>');
   return `
   <div class="job-card ${job.ad_type==='premium'?'ad-premium':''}" onclick="navigate('/jobs/${job.id}')">
     <div style="display:flex;gap:0.3rem;margin-bottom:0.25rem">${badges.join('')}</div>
@@ -714,6 +761,7 @@ function renderJobCardMini(job) {
     <div style="display:flex;gap:0.5rem;margin-top:0.3rem;font-size:0.75rem;color:#4a5980;flex-wrap:wrap">
       <span><i class="fas fa-map-marker-alt" style="color:#1c7cff"></i> ${escapeHtml(job.region)}</span>
       ${job.commission_rate ? `<span><i class="fas fa-percent" style="color:#f9a825"></i> ${job.commission_rate}%</span>` : ''}
+      ${job.daily_pay > 0 ? `<span><i class="fas fa-money-bill" style="color:#16a34a"></i> 일비 ${Number(job.daily_pay).toLocaleString()}원</span>` : ''}
     </div>
   </div>`;
 }
@@ -737,9 +785,9 @@ function renderAdCta() {
       </div>
       <div style="display:flex;gap:0.75rem;flex-wrap:wrap">
         ${[
-          {t:'🔥 히트AD', sub:'50만원/월', c:'#ef5350'},
-          {t:'⭐ 프리미엄', sub:'30만원/월', c:'#ffa726'},
-          {t:'📌 스탠다드', sub:'10만원/월', c:'#66bb6a'},
+          {t:'★ 프리미엄', sub:'최상단 노출', c:'#f9a825'},
+          {t:'◆ 슈페리어', sub:'상단 노출', c:'#ab47bc'},
+          {t:'◎ 베이직', sub:'기본 노출', c:'#66bb6a'},
           {t:'🆓 무료', sub:'2건/일', c:'#78909c'},
         ].map(a => `
           <div style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);
@@ -759,14 +807,14 @@ function renderAdCta() {
         onmouseout="this.style.transform='translateY(0)'">
         <i class="fas fa-info-circle"></i> 광고 상품 보기
       </button>
-      <button onclick="navigate('/sites/new')"
+      <button onclick="navigate('/jobs/new')"
         style="background:rgba(255,255,255,0.15);color:white;
           border:1px solid rgba(255,255,255,0.3);padding:0.65rem 1.75rem;
           border-radius:10px;font-size:0.88rem;font-weight:600;cursor:pointer;
           transition:background 0.2s;font-family:inherit"
         onmouseover="this.style.background='rgba(255,255,255,0.25)'"
         onmouseout="this.style.background='rgba(255,255,255,0.15)'">
-        <i class="fas fa-plus"></i> 단지 등록
+        <i class="fas fa-plus"></i> 구인 공고 등록
       </button>
     </div>
   </div>`;

@@ -180,8 +180,14 @@ app.get('/api/home', async (c) => {
     c.env.DB.prepare(
       "SELECT * FROM properties WHERE status != 'closed' AND is_new = 1 ORDER BY created_at DESC LIMIT 8"
     ).all(),
+    // 홈 구인공고: 광고등급 프리미엄→슈페리어→베이직→없음 순, 각 등급 내 최신순, 확장필드 전부 포함
     c.env.DB.prepare(
-      "SELECT * FROM job_posts WHERE status = 'active' ORDER BY is_urgent DESC, is_best DESC, is_hot DESC, created_at DESC LIMIT 6"
+      `SELECT j.*,
+        CASE j.ad_type WHEN 'premium' THEN 0 WHEN 'superior' THEN 1 WHEN 'basic' THEN 2 ELSE 3 END as ad_order
+       FROM job_posts j
+       WHERE j.status = 'active'
+       ORDER BY ad_order ASC, j.is_urgent DESC, j.is_best DESC, j.is_hot DESC, j.created_at DESC
+       LIMIT 60`
     ).all(),
     c.env.DB.prepare(
       "SELECT id, title, news_type, is_pinned, view_count, created_at FROM news ORDER BY is_pinned DESC, created_at DESC LIMIT 5"
@@ -198,11 +204,22 @@ app.get('/api/home', async (c) => {
   for (const row of (siteStats.results as any[])) {
     stats[(row as any).stat_key] = (row as any).stat_value
   }
+
+  // 광고등급별 그룹핑
+  const allJobs = featuredJobs.results as any[]
+  const premiumJobs  = allJobs.filter(j => j.ad_type === 'premium')
+  const superiorJobs = allJobs.filter(j => j.ad_type === 'superior')
+  const basicJobs    = allJobs.filter(j => j.ad_type === 'basic')
+  const normalJobs   = allJobs.filter(j => !j.ad_type || j.ad_type === 'none')
   
   return c.json({
     bestProperties: bestProperties.results,
     newProperties: newProperties.results,
-    featuredJobs: featuredJobs.results,
+    featuredJobs: allJobs,          // 전체 (기존 호환)
+    premiumJobs,
+    superiorJobs,
+    basicJobs,
+    normalJobs,
     latestNews: latestNews.results,
     banners: banners.results,
     stats
