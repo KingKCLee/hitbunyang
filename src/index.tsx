@@ -22,8 +22,11 @@ app.use('/api/*', cors({
 // Auth middleware for all routes
 app.use('*', authMiddleware)
 
-// Static files
+// Static files - /static/* 경로로 모든 정적 파일 서빙
 app.use('/static/*', serveStatic({ root: './' }))
+
+// 브라우저 기본 favicon 요청 → /static/logo-32.png로 리다이렉트
+app.get('/favicon.ico', (c) => c.redirect('/static/logo-32.png', 301))
 
 // API Routes
 app.route('/api/auth', authRoutes)
@@ -219,10 +222,20 @@ function getHtmlTemplate(): string {
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
   <title>히트분양 - 전국 신규 분양 단지 정보</title>
   <meta name="description" content="전국 신규 분양 단지 정보와 분양 채용 정보를 한곳에서! 아파트, 오피스텔, 상가 분양 정보 제공 | 히트분양 1533-9077">
-  <meta name="theme-color" content="#1a237e">
+  <meta name="theme-color" content="#1c7cff">
+  <!-- 파비콘 - /static/ 경로 사용 -->
+  <link rel="icon" type="image/png" sizes="32x32" href="/static/logo-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/static/logo-16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/static/logo-180.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/static/logo-192.png">
+  <link rel="icon" type="image/png" sizes="256x256" href="/static/logo-256.png">
+  <!-- OG 태그 -->
   <meta property="og:title" content="히트분양 - 전국 신규 분양 단지 정보">
   <meta property="og:description" content="전국 신규 분양 단지 정보를 히트분양에서 확인하세요">
   <meta property="og:url" content="https://hitbunyang.com">
+  <meta property="og:image" content="https://hitbunyang.com/static/logo.png">
+  <meta property="og:image:width" content="1024">
+  <meta property="og:image:height" content="1024">
   <!-- Pretendard Variable - 다방앱 동일 CDN -->
   <link rel="preconnect" href="//static.dabangapp.com">
   <link rel="stylesheet" href="//static.dabangapp.com/web/fonts/pretendard-variable/v1.3.9/pretendardvariable-dynamic-subset.min.gzip.css">

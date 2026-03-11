@@ -602,8 +602,11 @@ function renderNavbar() {
     <div class="navbar-inner">
       <div class="navbar-top">
         <a class="navbar-brand" href="/" onclick="navigate('/');return false">
-          <span class="brand-hit">히트</span><span class="brand-bun">분양</span>
-          <span class="brand-tag">HITBUNYANG.COM</span>
+          <img src="/static/logo.png" alt="히트분양" class="brand-logo-img">
+          <div class="brand-text-wrap">
+            <span class="brand-hit">히트</span><span class="brand-bun">분양</span>
+            <span class="brand-tag">HITBUNYANG.COM</span>
+          </div>
         </a>
         <div class="navbar-search desktop-only">
           <div class="search-wrap">
@@ -717,7 +720,10 @@ function renderFooter() {
     <div class="container">
       <div class="footer-grid">
         <div class="footer-col footer-col-brand">
-          <div class="footer-brand"><span class="brand-hit">히트</span><span class="brand-bun">분양</span></div>
+          <div class="footer-brand">
+            <img src="/static/logo.png" alt="히트분양" class="footer-logo-img">
+            <span><span class="brand-hit">히트</span><span class="brand-bun">분양</span></span>
+          </div>
           <p class="footer-tagline">대한민국 분양정보 히트 플랫폼</p>
           <p class="footer-desc">전국 신규 분양 단지 정보와 분양 채용 정보를<br>히트지수 기반으로 한눈에!</p>
           <div class="footer-contact">
