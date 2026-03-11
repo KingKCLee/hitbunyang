@@ -331,11 +331,11 @@ function renderCommunityPageContent(container) {
               총 ${demoPosts[tab]?.length || 0}개 게시물
             </span>
             ${state.user ? `
-              <button class="btn btn-primary btn-sm" onclick="alert('로그인 후 작성할 수 있습니다.')">
+              <button class="btn btn-primary btn-sm" onclick="openWriteModal && openWriteModal()">
                 <i class="fas fa-pen"></i> 글쓰기
               </button>` : `
               <button class="btn btn-outline btn-sm" onclick="navigate('/login')">
-                <i class="fas fa-pen"></i> 로그인 후 글쓰기
+                <i class="fas fa-sign-in-alt"></i> 로그인 후 글쓰기
               </button>`}
           </div>
           <div id="community-posts">

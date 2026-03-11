@@ -301,7 +301,7 @@ function renderApp() {
   if (!appEl) return;
   const path = location.pathname;
   
-  appEl.innerHTML = renderNavbar() + '<main id="main-content"></main>' + renderFooter();
+  appEl.innerHTML = renderNavbar() + '<main id="main-content"></main>' + renderFooter() + renderFloatingButtons();
   
   const route = matchRoute(path);
   const main = document.getElementById('main-content');
@@ -323,7 +323,255 @@ function renderApp() {
     const isActive = navPath === '/' ? path === '/' : path.startsWith(navPath);
     el.classList.toggle('active', isActive);
   });
+
+  // 스크롤 → TOP 버튼 표시/숨김
+  initScrollTopBtn();
 }
+
+// ============================================================
+// 플로팅 버튼 (글쓰기 + TOP)
+// ============================================================
+function renderFloatingButtons() {
+  return `
+  <!-- 플로팅 버튼 -->
+  <div class="fab-container" id="fab-container">
+    <!-- 글쓰기 -->
+    <button class="fab fab-write" id="fab-write" onclick="openWriteModal()" title="글쓰기">
+      <i class="fas fa-pen"></i>
+      <span class="fab-label">글쓰기</span>
+    </button>
+    <!-- TOP -->
+    <button class="fab fab-top" id="fab-top" onclick="scrollToTop()" title="맨 위로" style="display:none">
+      <i class="fas fa-chevron-up"></i>
+      <span class="fab-label">TOP</span>
+    </button>
+  </div>
+
+  <!-- 글쓰기 모달 -->
+  <div class="modal-overlay" id="write-modal" style="display:none" onclick="if(event.target===this)closeWriteModal()">
+    <div class="modal-content" style="max-width:600px;width:95%;max-height:90vh;overflow-y:auto">
+      <div style="display:flex;justify-content:space-between;align-items:center;
+        padding:1.25rem 1.5rem;border-bottom:1px solid #e5e8f0;position:sticky;top:0;
+        background:white;z-index:1;border-radius:16px 16px 0 0">
+        <h3 style="font-size:1.1rem;font-weight:800;color:#1a1a2e">
+          <i class="fas fa-pen" style="color:#1a237e;margin-right:0.4rem"></i> 글쓰기
+        </h3>
+        <button onclick="closeWriteModal()"
+          style="background:none;border:none;font-size:1.4rem;color:#9ca3af;cursor:pointer;line-height:1">×</button>
+      </div>
+      <div style="padding:1.5rem">
+        <!-- 카테고리 선택 -->
+        <div style="margin-bottom:1rem">
+          <label style="font-size:0.83rem;font-weight:700;color:#374151;display:block;margin-bottom:0.4rem">
+            카테고리 <span style="color:#e53935">*</span>
+          </label>
+          <div style="display:flex;gap:0.5rem;flex-wrap:wrap">
+            ${[
+              {id:'review', label:'현장후기', icon:'⭐'},
+              {id:'free',   label:'자유게시판', icon:'💬'},
+              {id:'info',   label:'정보공유', icon:'📢'},
+              {id:'qa',     label:'Q&A', icon:'❓'},
+            ].map(c => `
+              <button class="write-cat-btn" data-cat="${c.id}" onclick="selectWriteCat('${c.id}',this)"
+                style="padding:0.45rem 0.9rem;border-radius:20px;font-size:0.82rem;font-weight:600;
+                  border:1.5px solid #e5e8f0;background:white;color:#6b7280;cursor:pointer;
+                  font-family:inherit;transition:all 0.15s">
+                ${c.icon} ${c.label}
+              </button>`).join('')}
+          </div>
+          <input type="hidden" id="write-cat-value" value="free">
+        </div>
+        <!-- 제목 -->
+        <div style="margin-bottom:1rem">
+          <label style="font-size:0.83rem;font-weight:700;color:#374151;display:block;margin-bottom:0.4rem">
+            제목 <span style="color:#e53935">*</span>
+          </label>
+          <input type="text" id="write-title" class="form-input"
+            placeholder="제목을 입력해주세요"
+            style="width:100%"
+            maxlength="100">
+          <div style="text-align:right;font-size:0.72rem;color:#9ca3af;margin-top:2px">
+            <span id="write-title-count">0</span>/100
+          </div>
+        </div>
+        <!-- 현장 연결 (선택) -->
+        <div style="margin-bottom:1rem">
+          <label style="font-size:0.83rem;font-weight:700;color:#374151;display:block;margin-bottom:0.4rem">
+            관련 현장 <span style="font-size:0.75rem;color:#9ca3af;font-weight:400">(선택)</span>
+          </label>
+          <input type="text" id="write-site" class="form-input"
+            placeholder="예: 래미안 원펜타스, 힐스테이트 판교역..."
+            style="width:100%">
+        </div>
+        <!-- 내용 -->
+        <div style="margin-bottom:1.25rem">
+          <label style="font-size:0.83rem;font-weight:700;color:#374151;display:block;margin-bottom:0.4rem">
+            내용 <span style="color:#e53935">*</span>
+          </label>
+          <textarea id="write-content" class="form-input"
+            placeholder="내용을 입력해주세요&#10;&#10;• 현장 후기는 실제 방문/계약 경험을 솔직하게 작성해 주세요&#10;• 욕설·비방·허위정보는 삭제될 수 있습니다"
+            rows="8"
+            maxlength="2000"
+            style="width:100%;resize:vertical;min-height:200px"
+            oninput="document.getElementById('write-content-count').textContent=this.value.length"></textarea>
+          <div style="text-align:right;font-size:0.72rem;color:#9ca3af;margin-top:2px">
+            <span id="write-content-count">0</span>/2000
+          </div>
+        </div>
+        <!-- 익명 선택 -->
+        <div style="margin-bottom:1.5rem;display:flex;align-items:center;gap:0.5rem">
+          <input type="checkbox" id="write-anonymous" style="width:16px;height:16px;cursor:pointer;accent-color:#1a237e">
+          <label for="write-anonymous" style="font-size:0.83rem;color:#374151;cursor:pointer;font-weight:500">
+            익명으로 작성
+          </label>
+        </div>
+        <!-- 버튼 -->
+        <div style="display:flex;gap:0.75rem">
+          <button onclick="closeWriteModal()"
+            style="flex:1;padding:0.75rem;border-radius:10px;border:1.5px solid #e5e8f0;
+              background:white;color:#6b7280;font-size:0.9rem;font-weight:600;cursor:pointer;
+              font-family:inherit">
+            취소
+          </button>
+          <button onclick="submitPost()"
+            style="flex:2;padding:0.75rem;border-radius:10px;border:none;
+              background:linear-gradient(135deg,#1a237e,#3949ab);color:white;
+              font-size:0.9rem;font-weight:700;cursor:pointer;font-family:inherit;
+              box-shadow:0 4px 12px rgba(26,35,126,0.3)">
+            <i class="fas fa-paper-plane"></i> 등록하기
+          </button>
+        </div>
+        <p style="text-align:center;font-size:0.75rem;color:#9ca3af;margin-top:0.75rem">
+          <i class="fas fa-lock"></i> 게시물은 커뮤니티 이용약관에 따라 관리됩니다
+        </p>
+      </div>
+    </div>
+  </div>`;
+}
+
+// 스크롤 TOP 버튼 초기화
+function initScrollTopBtn() {
+  const topBtn = document.getElementById('fab-top');
+  if (!topBtn) return;
+  window.onscroll = null;
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 300) {
+      topBtn.style.display = 'flex';
+    } else {
+      topBtn.style.display = 'none';
+    }
+  }, { passive: true });
+}
+
+function scrollToTop() {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// 글쓰기 모달 열기
+function openWriteModal() {
+  if (!state.user) {
+    if (confirm('로그인이 필요합니다. 로그인 페이지로 이동할까요?')) {
+      navigate('/login');
+    }
+    return;
+  }
+  const modal = document.getElementById('write-modal');
+  if (modal) {
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    // 기본 카테고리 선택 표시
+    const defaultBtn = document.querySelector('.write-cat-btn[data-cat="free"]');
+    if (defaultBtn) selectWriteCat('free', defaultBtn);
+    setTimeout(() => document.getElementById('write-title')?.focus(), 100);
+  }
+}
+
+function closeWriteModal() {
+  const modal = document.getElementById('write-modal');
+  if (modal) {
+    modal.style.display = 'none';
+    document.body.style.overflow = '';
+    // 폼 초기화
+    const ids = ['write-title','write-content','write-site'];
+    ids.forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+    document.getElementById('write-title-count').textContent = '0';
+    document.getElementById('write-content-count').textContent = '0';
+    const anon = document.getElementById('write-anonymous');
+    if (anon) anon.checked = false;
+  }
+}
+
+function selectWriteCat(catId, btn) {
+  document.querySelectorAll('.write-cat-btn').forEach(b => {
+    b.style.background = 'white';
+    b.style.color = '#6b7280';
+    b.style.borderColor = '#e5e8f0';
+  });
+  if (btn) {
+    btn.style.background = '#e8f0fe';
+    btn.style.color = '#1a237e';
+    btn.style.borderColor = '#1a237e';
+  }
+  const inp = document.getElementById('write-cat-value');
+  if (inp) inp.value = catId;
+}
+
+async function submitPost() {
+  const title   = document.getElementById('write-title')?.value?.trim();
+  const content = document.getElementById('write-content')?.value?.trim();
+  const cat     = document.getElementById('write-cat-value')?.value || 'free';
+  const site    = document.getElementById('write-site')?.value?.trim();
+  const anon    = document.getElementById('write-anonymous')?.checked;
+
+  if (!title)   { alert('제목을 입력해주세요.'); document.getElementById('write-title')?.focus(); return; }
+  if (!content) { alert('내용을 입력해주세요.'); document.getElementById('write-content')?.focus(); return; }
+  if (content.length < 10) { alert('내용을 10자 이상 입력해주세요.'); return; }
+
+  const submitBtn = document.querySelector('#write-modal button[onclick="submitPost()"]');
+  if (submitBtn) { submitBtn.disabled = true; submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 등록 중...'; }
+
+  try {
+    const res = await api.post('/api/community/posts', { title, content, category: cat, related_site: site || null, is_anonymous: anon });
+    if (res.ok) {
+      closeWriteModal();
+      showToast('✅ 게시물이 등록되었습니다!', 'success');
+      // 커뮤니티 탭으로 이동
+      setTimeout(() => navigate('/community?tab=' + cat), 500);
+    } else {
+      showToast(res.data?.error || '등록 중 오류가 발생했습니다.', 'error');
+    }
+  } catch(e) {
+    // 백엔드 미연동 시 데모 처리
+    closeWriteModal();
+    showToast('✅ 게시물이 등록되었습니다! (데모)', 'success');
+    setTimeout(() => navigate('/community?tab=' + cat), 500);
+  } finally {
+    if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> 등록하기'; }
+  }
+}
+
+// 토스트 알림
+function showToast(msg, type = 'info') {
+  let toast = document.getElementById('global-toast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'global-toast';
+    document.body.appendChild(toast);
+  }
+  const colors = { success: '#2e7d32', error: '#c62828', info: '#1a237e', warning: '#f9a825' };
+  toast.style.cssText = `
+    position:fixed;bottom:90px;left:50%;transform:translateX(-50%);
+    background:${colors[type]||colors.info};color:white;
+    padding:0.75rem 1.5rem;border-radius:12px;font-size:0.88rem;font-weight:600;
+    box-shadow:0 4px 20px rgba(0,0,0,0.25);z-index:99999;
+    animation:slideUp 0.3s ease;white-space:nowrap;max-width:90vw;text-align:center
+  `;
+  toast.textContent = msg;
+  toast.style.display = 'block';
+  clearTimeout(toast._timer);
+  toast._timer = setTimeout(() => { toast.style.display = 'none'; }, 3000);
+}
+window.showToast = showToast;
 
 // ============================================================
 // NAVBAR (새 메뉴 구조)
@@ -689,3 +937,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
+
+// Global exports
+window.openWriteModal   = openWriteModal;
+window.closeWriteModal  = closeWriteModal;
+window.selectWriteCat   = selectWriteCat;
+window.submitPost       = submitPost;
+window.scrollToTop      = scrollToTop;
+window.showToast        = showToast;

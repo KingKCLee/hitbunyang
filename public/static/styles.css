@@ -1254,3 +1254,92 @@ button { font-family: inherit; }
   .hero-search-box button { padding: 0.65rem 1rem; }
   .mobile-menu-grid { grid-template-columns: repeat(4, 1fr); }
 }
+
+/* ================================================================
+   FLOATING BUTTONS — 글쓰기 + TOP (분양라인 스타일)
+   ================================================================ */
+.fab-container {
+  position: fixed;
+  right: 1.5rem;
+  bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  z-index: 900;
+}
+
+.fab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 54px;
+  height: 54px;
+  border-radius: 14px;
+  border: none;
+  cursor: pointer;
+  font-family: 'Pretendard Variable', 'Pretendard', sans-serif;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+  gap: 3px;
+  line-height: 1;
+}
+
+.fab:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+}
+
+.fab:active {
+  transform: translateY(-1px) scale(0.96);
+}
+
+.fab i {
+  font-size: 1.1rem;
+}
+
+.fab-label {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+/* 글쓰기 버튼 — 네이비 */
+.fab-write {
+  background: linear-gradient(135deg, #1a237e, #3949ab);
+  color: white;
+}
+
+.fab-write:hover {
+  background: linear-gradient(135deg, #0d1257, #1a237e);
+}
+
+/* TOP 버튼 — 라이트 그레이 */
+.fab-top {
+  background: white;
+  color: #374151;
+  border: 1.5px solid #e5e8f0;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+}
+
+.fab-top:hover {
+  background: #f5f7ff;
+  color: #1a237e;
+  border-color: #1a237e;
+}
+
+/* 모바일 */
+@media (max-width: 768px) {
+  .fab-container {
+    right: 1rem;
+    bottom: 1.5rem;
+  }
+  .fab {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+  }
+  .fab i { font-size: 1rem; }
+  .fab-label { font-size: 0.56rem; }
+}
