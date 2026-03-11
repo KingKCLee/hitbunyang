@@ -354,8 +354,8 @@ function renderNavbar() {
     <div class="navbar-inner">
       <div class="navbar-top">
         <a class="navbar-brand" href="/" onclick="navigate('/');return false">
-          <span class="brand-hit">HIT</span><span class="brand-bun">분양</span>
-          <span class="brand-tag">HITBUNYANG</span>
+          <span class="brand-hit">히트</span><span class="brand-bun">분양</span>
+          <span class="brand-tag">HITBUNYANG.COM</span>
         </a>
         <div class="navbar-search desktop-only">
           <div class="search-wrap">
@@ -469,7 +469,7 @@ function renderFooter() {
     <div class="container">
       <div class="footer-grid">
         <div class="footer-col footer-col-brand">
-          <div class="footer-brand"><span class="brand-hit">HIT</span><span class="brand-bun">분양</span></div>
+          <div class="footer-brand"><span class="brand-hit">히트</span><span class="brand-bun">분양</span></div>
           <p class="footer-tagline">대한민국 분양정보 히트 플랫폼</p>
           <p class="footer-desc">전국 신규 분양 단지 정보와 분양 채용 정보를<br>히트지수 기반으로 한눈에!</p>
           <div class="footer-contact">
@@ -527,9 +527,9 @@ function renderFooter() {
       </div>
       <div class="footer-bottom">
         <div class="footer-bottom-left">
-          <span>© 2025 히트분양(HITBUNYANG). All rights reserved.</span>
-          <span>사업자등록번호: 000-00-00000</span>
-          <span>대표: 홍길동</span>
+          <span>© 2025 더블유부동산. All rights reserved.</span>
+          <span>사업자등록번호: 589-24-01721</span>
+          <span>대표: 이광철</span>
         </div>
         <div class="footer-bottom-right">
           <a class="footer-link" href="#">이용약관</a>

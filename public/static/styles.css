@@ -2,7 +2,11 @@
    히트분양 - 다방(Dabang) 톤앤매너 스타일 v5
    Primary: 화이트 배경 + 다크 네이비 포인트
    Brand colors: #1a237e (deep navy), #e8f0fe (light blue bg)
+   Font: Pretendard Variable (다방 동일 CDN)
    ================================================================ */
+
+/* Pretendard Variable — 다방 동일 CDN */
+@import url('//static.dabangapp.com/web/fonts/pretendard-variable/v1.3.9/pretendardvariable-dynamic-subset.min.gzip.css');
 
 :root {
   /* 브랜드 컬러 - 다방 스타일 네이비 */
@@ -47,7 +51,7 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
 body {
-  font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic', -apple-system, BlinkMacSystemFont, 'Noto Sans KR', sans-serif;
+  font-family: 'Pretendard Variable', 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
   color: var(--text-primary);
   line-height: 1.6;
   background: var(--bg-page);
@@ -94,12 +98,14 @@ button { font-family: inherit; }
   text-decoration: none;
   flex-shrink: 0;
 }
+/* 히트분양 — '히트'(네이비) + '분양'(레드) 2색 로고 */
 .brand-hit {
   font-size: 1.55rem;
   font-weight: 900;
   color: var(--primary);
   letter-spacing: -1.5px;
   line-height: 1;
+  font-family: 'Pretendard Variable', 'Pretendard', sans-serif;
 }
 .brand-bun {
   font-size: 1.55rem;
@@ -107,6 +113,7 @@ button { font-family: inherit; }
   color: var(--accent-red);
   letter-spacing: -1.5px;
   line-height: 1;
+  font-family: 'Pretendard Variable', 'Pretendard', sans-serif;
 }
 .brand-tag {
   font-size: 0.55rem;
@@ -116,6 +123,7 @@ button { font-family: inherit; }
   margin-left: 5px;
   align-self: flex-end;
   margin-bottom: 2px;
+  font-family: 'Pretendard Variable', 'Pretendard', sans-serif;
 }
 
 /* 검색 바 */
