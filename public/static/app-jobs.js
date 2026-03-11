@@ -144,229 +144,453 @@ function renderJobCard(j) {
 }
 
 // ============================================================
-// JOB DETAIL PAGE  (분양라인 스타일 v2)
+// JOB DETAIL PAGE  (분양라인 샘플사이트 동일 구조 v3)
 // ============================================================
 async function renderJobDetailPage(container, params) {
   container.innerHTML = `<div class="loading-overlay"><div class="spinner"></div></div>`;
-  
+
   const r = await api.get(`/jobs/${params.id}`);
-  if (!r.ok) { container.innerHTML = `<div class="container"><div class="alert alert-error">게시글을 불러오는데 실패했습니다.</div></div>`; return; }
-  
-  const { post: j, related } = r.data;
-  
-  const badges = [];
-  if (j.ad_type === 'premium') badges.push('<span class="badge badge-premium-ad" style="font-size:0.82rem;padding:3px 10px">★ 프리미엄</span>');
-  if (j.ad_type === 'superior') badges.push('<span class="badge" style="background:#ede9fe;color:#6d28d9;border:1px solid #c4b5fd;font-size:0.82rem;padding:3px 10px">◆ 슈페리어</span>');
-  if (j.is_urgent) badges.push('<span class="badge badge-urgent" style="font-size:0.82rem;padding:3px 10px">🚨 급구</span>');
-  if (j.is_hot) badges.push('<span class="badge badge-hot" style="font-size:0.82rem;padding:3px 10px">🔥 HOT</span>');
-  if (j.is_best) badges.push('<span class="badge badge-best" style="font-size:0.82rem;padding:3px 10px">💰 대박</span>');
-
-  // 공유 URL  
-  const shareUrl = `https://www.bunyangline.com/r/share/${j.id}`;
-
-  // 업종 파싱
-  const propTypes = j.property_types ? j.property_types.split(',').map(t => t.trim()).filter(Boolean) : [];
-
-  // 급여 정보 행 구성
-  const payRows = [];
-  if (j.commission_note || j.commission_rate) {
-    if (j.commission_rate) payRows.push(`<tr><td class="cl-info-label">수수료율</td><td>${escapeHtml(String(j.commission_rate))}%</td></tr>`);
-    if (j.commission_note) payRows.push(`<tr><td class="cl-info-label">수수료 조건</td><td style="white-space:pre-line">${escapeHtml(j.commission_note)}</td></tr>`);
+  if (!r.ok) {
+    container.innerHTML = `<div class="container" style="padding:2rem"><div class="alert alert-error">게시글을 불러오는데 실패했습니다.</div></div>`;
+    return;
   }
-  if (j.daily_pay > 0) payRows.push(`<tr><td class="cl-info-label">일비</td><td>${Number(j.daily_pay).toLocaleString()}원</td></tr>`);
-  if (j.accommodation_pay > 0) payRows.push(`<tr><td class="cl-info-label">숙소비</td><td>${Number(j.accommodation_pay).toLocaleString()}원/월</td></tr>`);
-  if (j.meal_support) payRows.push(`<tr><td class="cl-info-label">식사</td><td>${escapeHtml(j.meal_support)}</td></tr>`);
-  if (j.transport_support) payRows.push(`<tr><td class="cl-info-label">교통비</td><td>${escapeHtml(j.transport_support)}</td></tr>`);
-  if (j.sales_support) payRows.push(`<tr><td class="cl-info-label">영업비</td><td>${escapeHtml(j.sales_support)}</td></tr>`);
+
+  const { post: j, related } = r.data;
+
+  // ── 광고 배지 ──
+  const adBadge = j.ad_type === 'premium'
+    ? `<span style="background:#ff6f00;color:#fff;font-size:0.72rem;font-weight:900;padding:3px 10px;border-radius:4px;letter-spacing:0.3px">★ AD</span>`
+    : j.ad_type === 'superior'
+    ? `<span style="background:#7b1fa2;color:#fff;font-size:0.72rem;font-weight:900;padding:3px 10px;border-radius:4px">◆ AD</span>`
+    : j.ad_type === 'basic'
+    ? `<span style="background:#1565c0;color:#fff;font-size:0.72rem;font-weight:800;padding:3px 10px;border-radius:4px">● AD</span>`
+    : '';
+
+  const statusBadges = [];
+  if (j.is_urgent) statusBadges.push(`<span style="background:#e53935;color:#fff;font-size:0.72rem;font-weight:800;padding:3px 8px;border-radius:4px">급구</span>`);
+  if (j.is_hot)    statusBadges.push(`<span style="background:#f57c00;color:#fff;font-size:0.72rem;font-weight:800;padding:3px 8px;border-radius:4px">HOT</span>`);
+  if (j.is_best)   statusBadges.push(`<span style="background:#2e7d32;color:#fff;font-size:0.72rem;font-weight:800;padding:3px 8px;border-radius:4px">대박</span>`);
+
+  // ── 업종 파싱 ──
+  const propTypes = j.property_types
+    ? j.property_types.split(',').map(t => t.trim()).filter(Boolean)
+    : (j.property_type ? [j.property_type] : []);
+
+  // ── 급여 형태 문자열 ──
+  const payType = '계약 수수료';
+
+  // ── 수수료 rows 구성 (분양라인처럼: 형태 + 각 업종별 금액) ──
+  const commissionRows = [];
+  commissionRows.push(`<tr><td class="bl-td-label">형태</td><td class="bl-td-val">${payType}</td></tr>`);
+  if (j.commission_note) {
+    // commission_note에서 줄별로 파싱해서 각 행으로 표시
+    const lines = j.commission_note.split('\n').map(l => l.trim()).filter(Boolean);
+    lines.forEach(line => {
+      // "아파트 분양 9,000,000원" 형태이면 라벨/값 분리
+      const m = line.match(/^(.+?)\s+([\d,]+원|\d+\.?\d*%)$/);
+      if (m) {
+        commissionRows.push(`<tr><td class="bl-td-label">${escapeHtml(m[1])}</td><td class="bl-td-val" style="font-weight:700;color:#c0392b">${escapeHtml(m[2])}</td></tr>`);
+      } else if (line && !line.startsWith('※') && !line.startsWith('#')) {
+        commissionRows.push(`<tr><td class="bl-td-label" colspan="2" style="color:#555;font-size:0.83rem;white-space:pre-line">${escapeHtml(line)}</td></tr>`);
+      }
+    });
+  } else if (j.commission_rate) {
+    commissionRows.push(`<tr><td class="bl-td-label">수수료율</td><td class="bl-td-val" style="font-weight:700;color:#c0392b">${j.commission_rate}%</td></tr>`);
+  }
+
+  // ── 근무후생 rows (분양라인: 식사/교통비/숙소/숙소비/일비/영업비 2열 그리드) ──
+  const welfare = [
+    { label: '식사',   val: j.meal_support      || '상담시 안내' },
+    { label: '교통비', val: j.transport_support  || '상담시 안내' },
+    { label: '숙소',   val: j.accommodation_pay > 0 ? `지원(${Number(j.accommodation_pay).toLocaleString()}원/월)` : '상담시 안내' },
+    { label: '숙소비', val: j.accommodation_pay > 0 ? `${Number(j.accommodation_pay).toLocaleString()}원/월` : '상담시 안내' },
+    { label: '일비',   val: j.daily_pay > 0 ? `${Number(j.daily_pay).toLocaleString()}원` : '상담시 안내' },
+    { label: '영업비', val: j.sales_support      || '상담시 안내' },
+  ];
+
+  // ── 카카오맵 지도 URL ──
+  const mapAddr = encodeURIComponent(j.work_address || j.biz_address || j.region);
+  const kakaoMapUrl = `https://map.kakao.com/?q=${mapAddr}`;
+
+  // ── 공유 URL ──
+  const shareUrl = `https://hitbunyang.pages.dev/jobs/${j.id}`;
 
   container.innerHTML = `
-  <style>
-    .cl-detail-wrap { max-width:960px; margin:0 auto; padding:1.5rem 1rem 4rem; }
-    .cl-detail-grid { display:grid; grid-template-columns:1fr 300px; gap:1.5rem; }
-    @media(max-width:860px){ .cl-detail-grid{ grid-template-columns:1fr!important; } }
-    .cl-card { background:#fff; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,0.07); margin-bottom:1rem; overflow:hidden; }
-    .cl-card-body { padding:1.25rem 1.5rem; }
-    .cl-infoBoxBasic { border:1px solid #e5e7eb; border-radius:8px; overflow:hidden; margin-bottom:1rem; }
-    .cl-infoBoxBasic-title { background:#f4f6fa; padding:0.65rem 1rem; font-size:0.88rem; font-weight:700; color:#374151; border-bottom:1px solid #e5e7eb; }
-    .cl-infoBoxBasic table { width:100%; border-collapse:collapse; }
-    .cl-infoBoxBasic table td { padding:0.6rem 1rem; font-size:0.87rem; border-bottom:1px solid #f3f4f6; vertical-align:top; }
-    .cl-infoBoxBasic table tr:last-child td { border-bottom:none; }
-    .cl-info-label { width:110px; color:#6b7280; font-size:0.82rem; white-space:nowrap; }
-    .cl-title-area { padding:1.25rem 1.5rem 0; }
-    .cl-main-img { width:100%; max-height:400px; object-fit:cover; border-radius:0; display:block; }
-    .cl-main-img-wrap { position:relative; background:#f3f4f6; }
-    .cl-contact-box { background:#fff; border-radius:12px; padding:1.25rem; box-shadow:0 4px 20px rgba(0,0,0,0.1); border:2px solid #bfdbfe; position:sticky; top:80px; }
-    .cl-share-bar { display:flex; gap:0.5rem; padding:0.75rem 1.5rem; border-top:1px solid #f3f4f6; }
-    .cl-share-btn { flex:1; padding:0.5rem; border:1px solid #e5e7eb; border-radius:6px; background:#fff; font-size:0.8rem; cursor:pointer; text-align:center; color:#374151; }
-    .cl-share-btn:hover { background:#f9fafb; }
-    .cl-desc-box { padding:1.25rem 1.5rem; font-size:0.9rem; line-height:1.85; color:#374151; white-space:pre-line; }
-  </style>
+<style>
+  /* ── 전체 래퍼 ── */
+  .bl-wrap { background:#f4f6fa; min-height:100vh; padding-bottom:3rem; }
+  .bl-inner { max-width:1000px; margin:0 auto; padding:0 1rem; }
 
-  <div class="cl-detail-wrap">
-    <!-- 브레드크럼 -->
-    <div style="display:flex;align-items:center;gap:0.4rem;margin-bottom:1rem;font-size:0.83rem;color:#9ca3af">
-      <a href="/" onclick="navigate('/');return false" style="color:#9ca3af;text-decoration:none">홈</a>
-      <i class="fas fa-chevron-right" style="font-size:0.65rem"></i>
-      <a href="/jobs" onclick="navigate('/jobs');return false" style="color:#9ca3af;text-decoration:none">채용정보</a>
-      <i class="fas fa-chevron-right" style="font-size:0.65rem"></i>
-      <span style="color:#374151;font-weight:600">${escapeHtml(j.title)}</span>
+  /* ── 상단 헤더 바 ── */
+  .bl-header { background:#fff; border-bottom:1px solid #e5e7eb; padding:0.75rem 0; margin-bottom:0; }
+  .bl-breadcrumb { display:flex; align-items:center; gap:0.4rem; font-size:0.82rem; color:#9ca3af; }
+  .bl-breadcrumb a { color:#9ca3af; text-decoration:none; }
+  .bl-breadcrumb a:hover { color:#374151; }
+
+  /* ── 페이지 레이아웃 ── */
+  .bl-layout { display:grid; grid-template-columns:1fr 300px; gap:1.25rem; padding-top:1.25rem; }
+  @media(max-width:860px){ .bl-layout{ grid-template-columns:1fr !important; } }
+
+  /* ── 섹션 박스 ── */
+  .bl-section { background:#fff; border:1px solid #e5e7eb; border-radius:8px; margin-bottom:1rem; overflow:hidden; }
+  .bl-section-title { background:#f8f9fb; border-bottom:1px solid #e5e7eb; padding:0.6rem 1rem;
+    font-size:0.82rem; font-weight:700; color:#374151; display:flex; align-items:center; gap:0.4rem; }
+
+  /* ── 정보 테이블 (분양라인 스타일) ── */
+  .bl-table { width:100%; border-collapse:collapse; }
+  .bl-table td { padding:0.7rem 1rem; font-size:0.87rem; border-bottom:1px solid #f3f4f6; vertical-align:top; }
+  .bl-table tr:last-child td { border-bottom:none; }
+  .bl-td-label { width:110px; color:#6b7280; font-size:0.82rem; white-space:nowrap; background:#fafbfc; }
+  .bl-td-val { color:#1f2937; }
+
+  /* ── 2열 그리드 테이블 (사업자 정보 / 근무후생) ── */
+  .bl-table-2col td { width:25%; }
+  .bl-table-2col .bl-td-label { width:80px; }
+
+  /* ── 지도 영역 ── */
+  .bl-map-area { background:#e8edf2; border-radius:6px; overflow:hidden; margin:0.75rem 1rem;
+    height:160px; display:flex; align-items:center; justify-content:center; position:relative;
+    cursor:pointer; border:1px solid #d1d5db; }
+  .bl-map-area:hover .bl-map-overlay { opacity:1; }
+  .bl-map-overlay { position:absolute; inset:0; background:rgba(0,0,0,0.35);
+    display:flex; align-items:center; justify-content:center;
+    color:#fff; font-size:0.88rem; font-weight:700; opacity:0; transition:opacity 0.2s; gap:0.4rem; }
+  .bl-map-note { font-size:0.74rem; color:#6b7280; padding:0 1rem 0.75rem; }
+
+  /* ── 업종 태그 ── */
+  .bl-type-tag { display:inline-block; background:#eff6ff; color:#1d4ed8;
+    border:1px solid #bfdbfe; border-radius:4px; padding:2px 10px; font-size:0.82rem; font-weight:700; margin-right:4px; }
+
+  /* ── 상세정보 본문 ── */
+  .bl-desc { padding:1rem; font-size:0.9rem; line-height:1.9; color:#374151; white-space:pre-line; word-break:break-word; }
+
+  /* ── 이미지 ── */
+  .bl-main-img { width:100%; max-height:420px; object-fit:cover; display:block; }
+
+  /* ── 공유 버튼바 ── */
+  .bl-share-bar { display:flex; gap:0.5rem; padding:0.85rem 1rem; border-top:1px solid #f3f4f6; background:#fafbfc; }
+  .bl-share-btn { flex:1; padding:0.5rem 0.25rem; border:1px solid #e5e7eb; border-radius:6px;
+    background:#fff; font-size:0.8rem; cursor:pointer; text-align:center; color:#374151;
+    font-family:inherit; transition:background 0.15s; text-decoration:none; display:flex;
+    align-items:center; justify-content:center; gap:0.3rem; }
+  .bl-share-btn:hover { background:#f0f4ff; border-color:#93c5fd; color:#1d4ed8; }
+
+  /* ── 사이드바 연락처 ── */
+  .bl-sidebar-contact { background:#fff; border:2px solid #1c7cff; border-radius:10px;
+    overflow:hidden; position:sticky; top:72px; box-shadow:0 4px 20px rgba(28,124,255,0.12); }
+  .bl-contact-header { background:linear-gradient(135deg,#1c7cff,#0057d9); padding:1rem;
+    color:#fff; display:flex; align-items:center; gap:0.5rem; }
+  .bl-contact-name { font-size:1.05rem; font-weight:900; color:#fff; margin-bottom:2px; }
+  .bl-contact-phone { font-size:1rem; font-weight:700; color:#fff; text-decoration:none; display:flex; align-items:center; gap:0.4rem; }
+  .bl-contact-phone:hover { color:#bfdbfe; }
+  .bl-call-btn { display:block; background:#1c7cff; color:#fff; text-align:center;
+    padding:0.75rem; font-size:0.95rem; font-weight:700; text-decoration:none;
+    border-top:1px solid rgba(255,255,255,0.2); transition:background 0.15s; }
+  .bl-call-btn:hover { background:#0057d9; }
+  .bl-msg-btn { display:block; background:#FEE500; color:#1c1c1c; text-align:center;
+    padding:0.65rem; font-size:0.88rem; font-weight:700; cursor:pointer;
+    border:none; width:100%; font-family:inherit; transition:opacity 0.15s; }
+  .bl-msg-btn:hover { opacity:0.88; }
+
+  /* ── 관련 구인 리스트 ── */
+  .bl-related-item { padding:0.7rem 1rem; border-bottom:1px solid #f3f4f6; cursor:pointer; transition:background 0.15s; }
+  .bl-related-item:last-child { border-bottom:none; }
+  .bl-related-item:hover { background:#f4f8ff; }
+  .bl-related-title { font-size:0.86rem; font-weight:700; color:#111827; margin-bottom:0.25rem;
+    overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+  .bl-related-meta { font-size:0.77rem; color:#6b7280; display:flex; gap:0.6rem; flex-wrap:wrap; }
+  .bl-related-badge { background:#eff6ff; color:#1d4ed8; padding:1px 7px; border-radius:3px; font-weight:700; font-size:0.7rem; }
+</style>
+
+<div class="bl-wrap">
+  <!-- 브레드크럼 헤더 -->
+  <div class="bl-header">
+    <div class="bl-inner">
+      <div class="bl-breadcrumb">
+        <a href="/" onclick="navigate('/');return false">홈</a>
+        <i class="fas fa-chevron-right" style="font-size:0.6rem"></i>
+        <a href="/jobs" onclick="navigate('/jobs');return false">구인글 목록</a>
+        <i class="fas fa-chevron-right" style="font-size:0.6rem"></i>
+        <span style="color:#374151">구인글 상세보기</span>
+      </div>
     </div>
+  </div>
 
-    <div class="cl-detail-grid">
-      <!-- 메인 컨텐츠 -->
+  <div class="bl-inner">
+    <div class="bl-layout">
+
+      <!-- ▌메인 컬럼 -->
       <div>
-        <div class="cl-card">
-          <!-- 이미지 -->
-          ${j.image_url ? `<div class="cl-main-img-wrap">
-            <img src="${escapeHtml(j.image_url)}" alt="${escapeHtml(j.title)}" class="cl-main-img" onerror="this.style.display='none'">
-          </div>` : ''}
 
-          <!-- 제목 영역 -->
-          <div class="cl-title-area">
-            <div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-bottom:0.6rem">${badges.join('')}</div>
-            <h1 style="font-size:1.35rem;font-weight:900;line-height:1.35;margin-bottom:0.4rem;color:#111827">${escapeHtml(j.title)}</h1>
-            <div style="display:flex;align-items:center;gap:1rem;font-size:0.82rem;color:#9ca3af;margin-bottom:0.5rem">
-              <span><i class="fas fa-eye"></i> 조회 ${(j.view_count||0).toLocaleString()}</span>
-              <span><i class="fas fa-clock"></i> ${j.created_at ? j.created_at.replace('T',' ').substring(0,19) : ''}</span>
-              ${j.expires_at ? `<span><i class="fas fa-calendar-times" style="color:#ef4444"></i> 마감 ${formatDate(j.expires_at)}</span>` : ''}
-            </div>
-          </div>
-
-          <!-- 근무지 정보 -->
-          <div class="cl-card-body" style="padding-top:0.5rem">
-            <div class="cl-infoBoxBasic">
-              <div class="cl-infoBoxBasic-title">📍 근무지 정보</div>
-              <table>
-                <tr><td class="cl-info-label">근무지명</td><td style="font-weight:700">${escapeHtml(j.site_name)}</td></tr>
-                ${j.work_address ? `<tr><td class="cl-info-label">근무지 주소</td><td>${escapeHtml(j.work_address)}${j.work_address_detail ? `<br><span style="font-size:0.8rem;color:#6b7280">(${escapeHtml(j.work_address_detail)})</span>` : ''}</td></tr>` : ''}
-                ${j.biz_address && j.biz_address !== j.work_address ? `<tr><td class="cl-info-label">사업지 주소</td><td>${escapeHtml(j.biz_address)}</td></tr>` : ''}
-                <tr><td class="cl-info-label">지역</td><td>${escapeHtml(j.region)}</td></tr>
-                ${j.start_date ? `<tr><td class="cl-info-label">투입일</td><td>${escapeHtml(j.start_date)}</td></tr>` : ''}
-              </table>
-            </div>
-
-            <!-- 사업자 정보 -->
-            ${(j.enforcement_company || j.construction_company || j.trust_company || j.agency_company) ? `
-            <div class="cl-infoBoxBasic">
-              <div class="cl-infoBoxBasic-title">🏢 사업자 정보</div>
-              <table>
-                ${j.enforcement_company ? `<tr><td class="cl-info-label">시행사</td><td>${escapeHtml(j.enforcement_company)}</td></tr>` : ''}
-                ${j.construction_company ? `<tr><td class="cl-info-label">시공사</td><td>${escapeHtml(j.construction_company)}</td></tr>` : ''}
-                ${j.trust_company ? `<tr><td class="cl-info-label">신탁사</td><td>${escapeHtml(j.trust_company)}</td></tr>` : ''}
-                ${j.agency_company ? `<tr><td class="cl-info-label">대행사</td><td>${escapeHtml(j.agency_company)}</td></tr>` : ''}
-              </table>
-            </div>` : ''}
-
-            <!-- 사업지 정보 -->
-            <div class="cl-infoBoxBasic">
-              <div class="cl-infoBoxBasic-title">🏗 사업지 정보</div>
-              <table>
-                <tr><td class="cl-info-label">업종</td><td>${propTypes.length ? propTypes.map(t => `<span style="display:inline-block;background:#eff6ff;color:#1d4ed8;border-radius:4px;padding:1px 8px;font-size:0.8rem;margin-right:4px">${escapeHtml(t)}</span>`).join('') : escapeHtml(j.property_type||'-')}</td></tr>
-                <tr><td class="cl-info-label">모집직급</td><td><strong>${getRankLabel(j.rank_type)}</strong></td></tr>
-                ${j.recruit_count ? `<tr><td class="cl-info-label">모집인원</td><td>${escapeHtml(j.recruit_count)}</td></tr>` : ''}
-                ${j.experience_required ? `<tr><td class="cl-info-label">경력조건</td><td>${escapeHtml(j.experience_required)}</td></tr>` : ''}
-                ${j.gender && j.gender !== 'N' ? `<tr><td class="cl-info-label">성별</td><td>${j.gender==='M'?'남성':j.gender==='F'?'여성':'무관'}</td></tr>` : ''}
-                ${j.age_condition ? `<tr><td class="cl-info-label">나이</td><td>${escapeHtml(j.age_condition)}</td></tr>` : ''}
-              </table>
-            </div>
-
-            <!-- 급여 정보 -->
-            ${payRows.length ? `
-            <div class="cl-infoBoxBasic">
-              <div class="cl-infoBoxBasic-title">💰 급여정보</div>
-              <table>${payRows.join('')}</table>
-            </div>` : ''}
-
-            <!-- 근무후생 -->
-            ${(j.meal_support || j.transport_support || j.sales_support || j.accommodation_pay > 0) ? `
-            <div class="cl-infoBoxBasic">
-              <div class="cl-infoBoxBasic-title">🎁 근무후생</div>
-              <table>
-                ${j.daily_pay > 0 ? `<tr><td class="cl-info-label">일비</td><td>${Number(j.daily_pay).toLocaleString()}원</td></tr>` : ''}
-                ${j.accommodation_pay > 0 ? `<tr><td class="cl-info-label">숙소비</td><td>${Number(j.accommodation_pay).toLocaleString()}원/월</td></tr>` : ''}
-                ${j.meal_support ? `<tr><td class="cl-info-label">식사</td><td>${escapeHtml(j.meal_support)}</td></tr>` : ''}
-                ${j.transport_support ? `<tr><td class="cl-info-label">교통비</td><td>${escapeHtml(j.transport_support)}</td></tr>` : ''}
-                ${j.sales_support ? `<tr><td class="cl-info-label">영업비</td><td>${escapeHtml(j.sales_support)}</td></tr>` : ''}
-              </table>
-            </div>` : ''}
-          </div>
-
-          <!-- 상세정보 (description) -->
-          ${j.description ? `
-          <div style="padding:0 1.5rem 0.5rem">
-            <div class="cl-infoBoxBasic">
-              <div class="cl-infoBoxBasic-title">📋 상세정보</div>
-              <div class="cl-desc-box">${escapeHtml(j.description)}</div>
-            </div>
-          </div>` : ''}
-
-          <!-- 공유 버튼 -->
-          <div class="cl-share-bar">
-            <button class="cl-share-btn" onclick="jobCopyLink('${shareUrl}')"><i class="fas fa-link"></i> URL 복사</button>
-            <button class="cl-share-btn" onclick="window.print()"><i class="fas fa-print"></i> 인쇄</button>
-            <a class="cl-share-btn" style="text-decoration:none" href="https://open.kakao.com/o/share?url=${encodeURIComponent(shareUrl)}" target="_blank"><i class="fas fa-share"></i> 공유</a>
-          </div>
-        </div>
-
-        <!-- 관련 공고 -->
-        ${related && related.length ? `
-        <div class="cl-card">
-          <div class="cl-card-body">
-            <div style="font-weight:800;font-size:1rem;margin-bottom:0.75rem;color:#1f2937">📌 같은 지역 구인 공고</div>
-            ${related.map(rj => `
-            <div style="padding:0.6rem 0;border-bottom:1px solid #f3f4f6;cursor:pointer" onclick="navigate('/jobs/${rj.id}')">
-              <div style="font-weight:700;font-size:0.9rem;color:#111827">${escapeHtml(rj.title)}</div>
-              <div style="font-size:0.78rem;color:#6b7280;margin-top:0.2rem">
-                ${escapeHtml(rj.region)} | ${getRankLabel(rj.rank_type)}
-                ${rj.commission_rate ? ` | 수수료 ${rj.commission_rate}%` : ''}
-                ${rj.daily_pay > 0 ? ` | 일비 ${Number(rj.daily_pay).toLocaleString()}원` : ''}
-              </div>
-            </div>`).join('')}
-          </div>
+        <!-- 현장 이미지 (있을 때) -->
+        ${j.image_url ? `
+        <div class="bl-section" style="margin-bottom:1rem">
+          <img src="${escapeHtml(j.image_url)}" alt="${escapeHtml(j.title)}" class="bl-main-img"
+            onerror="this.closest('.bl-section').style.display='none'">
         </div>` : ''}
-      </div>
 
-      <!-- 연락처 사이드바 -->
-      <div>
-        <div class="cl-contact-box">
-          <div style="font-size:0.95rem;font-weight:800;color:#1e40af;margin-bottom:0.85rem;display:flex;align-items:center;gap:0.5rem">
-            <i class="fas fa-phone-alt"></i> 지원 / 문의
+        <!-- 제목 / 배지 -->
+        <div class="bl-section" style="padding:1rem 1rem 0.85rem">
+          <div style="display:flex;gap:0.35rem;flex-wrap:wrap;margin-bottom:0.55rem">
+            ${adBadge} ${statusBadges.join(' ')}
           </div>
-          <div style="background:#eff6ff;border-radius:8px;padding:0.9rem;margin-bottom:0.9rem">
-            <div style="font-size:0.75rem;color:#6b7280;margin-bottom:0.2rem">담당자</div>
-            <div style="font-weight:800;font-size:1rem;margin-bottom:0.25rem">${escapeHtml(j.contact_name)}</div>
-            <a href="tel:${escapeHtml(j.contact_phone)}" style="color:#1e40af;font-weight:700;font-size:0.95rem;text-decoration:none">
-              <i class="fas fa-phone"></i> ${escapeHtml(j.contact_phone)}
-            </a>
-            ${j.contact_kakao ? `<div style="margin-top:0.5rem;background:#FEE500;color:#1c1c1c;font-weight:700;font-size:0.82rem;padding:0.3rem 0.7rem;border-radius:5px;display:inline-block">
-              💬 카카오 ID: ${escapeHtml(j.contact_kakao)}
-            </div>` : ''}
-          </div>
-
-          <form onsubmit="submitJobInquiry(event, ${j.id})">
-            <div class="form-group">
-              <input class="form-input" name="name" placeholder="이름 *" required value="${state.user ? escapeHtml(state.user.name) : ''}">
-            </div>
-            <div class="form-group">
-              <input class="form-input" name="phone" placeholder="연락처 *" required value="${state.user ? escapeHtml(state.user.phone||'') : ''}">
-            </div>
-            <div class="form-group">
-              <textarea class="form-textarea" name="message" placeholder="지원 내용 (경력, 희망 조건 등)" style="min-height:75px"></textarea>
-            </div>
-            <button type="submit" class="btn btn-primary" style="width:100%;font-size:0.92rem">
-              <i class="fas fa-paper-plane"></i> 지원 문의 접수
-            </button>
-          </form>
-          <div id="job-inquiry-result" style="margin-top:0.5rem"></div>
-
-          <div style="margin-top:0.85rem;padding-top:0.75rem;border-top:1px solid #e5e7eb;font-size:0.78rem;color:#9ca3af;line-height:1.6">
-            공유 URL<br>
-            <span style="font-size:0.72rem;color:#6b7280;word-break:break-all">${shareUrl}</span>
+          <h1 style="font-size:1.25rem;font-weight:900;color:#111827;line-height:1.35;margin-bottom:0.5rem">
+            ${escapeHtml(j.title)}
+          </h1>
+          <div style="display:flex;align-items:center;gap:1rem;font-size:0.8rem;color:#9ca3af;flex-wrap:wrap">
+            <span><i class="fas fa-eye"></i> 조회 ${(j.view_count||0).toLocaleString()}</span>
+            <span><i class="fas fa-clock"></i> ${j.created_at ? j.created_at.replace('T',' ').substring(0,19) : ''}</span>
+            ${j.expires_at ? `<span style="color:#ef4444"><i class="fas fa-calendar-times"></i> 마감 ${formatDate(j.expires_at)}</span>` : ''}
           </div>
         </div>
-      </div>
-    </div>
-  </div>`;
+
+        <!-- 1. 근무지 정보 -->
+        <div class="bl-section">
+          <div class="bl-section-title"><i class="fas fa-map-marker-alt" style="color:#e53935"></i> 근무지 정보</div>
+          <!-- 지도 영역 -->
+          <a href="${kakaoMapUrl}" target="_blank" class="bl-map-area">
+            <div style="text-align:center;color:#6b7280">
+              <i class="fas fa-map" style="font-size:2rem;margin-bottom:0.4rem;display:block;color:#9ca3af"></i>
+              <div style="font-size:0.82rem">${escapeHtml((j.work_address||j.biz_address||j.region).substring(0,30))}</div>
+            </div>
+            <div class="bl-map-overlay"><i class="fas fa-external-link-alt"></i> 카카오맵에서 보기</div>
+          </a>
+          <p class="bl-map-note">※ 지도 클릭 시 카카오맵에서 자세히 확인하실 수 있습니다.</p>
+          <table class="bl-table">
+            <tr>
+              <td class="bl-td-label">근무지역 주소</td>
+              <td class="bl-td-val">
+                ${escapeHtml(j.work_address || '-')}
+                ${j.work_address_detail ? `<br><span style="color:#6b7280;font-size:0.8rem">${escapeHtml(j.work_address_detail)}</span>` : ''}
+              </td>
+            </tr>
+          </table>
+        </div>
+
+        <!-- 2. 사업자 정보 -->
+        <div class="bl-section">
+          <div class="bl-section-title"><i class="fas fa-building" style="color:#1c7cff"></i> 사업자 정보</div>
+          <table class="bl-table bl-table-2col">
+            <tr>
+              <td class="bl-td-label">시행사</td>
+              <td class="bl-td-val">${escapeHtml(j.enforcement_company||'-')}</td>
+              <td class="bl-td-label">시공사</td>
+              <td class="bl-td-val">${escapeHtml(j.construction_company||'-')}</td>
+            </tr>
+            <tr>
+              <td class="bl-td-label">신탁사</td>
+              <td class="bl-td-val">${escapeHtml(j.trust_company||'-')}</td>
+              <td class="bl-td-label">대행사</td>
+              <td class="bl-td-val">${escapeHtml(j.agency_company||'-')}</td>
+            </tr>
+            <tr>
+              <td class="bl-td-label">담당자 이름</td>
+              <td class="bl-td-val">${escapeHtml(j.contact_name||'-')}</td>
+              <td class="bl-td-label">담당자 연락처</td>
+              <td class="bl-td-val">
+                <a href="tel:${escapeHtml(j.contact_phone||'')}" style="color:#1c7cff;font-weight:700;text-decoration:none">
+                  ${escapeHtml(j.contact_phone||'-')}
+                </a>
+              </td>
+            </tr>
+          </table>
+        </div>
+
+        <!-- 3. 사업지 정보 -->
+        <div class="bl-section">
+          <div class="bl-section-title"><i class="fas fa-home" style="color:#7c3aed"></i> 사업지 정보</div>
+          <!-- 사업지 지도 -->
+          ${j.biz_address ? `
+          <a href="https://map.kakao.com/?q=${encodeURIComponent(j.biz_address)}" target="_blank" class="bl-map-area">
+            <div style="text-align:center;color:#6b7280">
+              <i class="fas fa-map-pin" style="font-size:2rem;margin-bottom:0.4rem;display:block;color:#9ca3af"></i>
+              <div style="font-size:0.82rem">${escapeHtml(j.biz_address.substring(0,30))}</div>
+            </div>
+            <div class="bl-map-overlay"><i class="fas fa-external-link-alt"></i> 카카오맵에서 보기</div>
+          </a>
+          <p class="bl-map-note">※ 지도 클릭 시 카카오맵에서 자세히 확인하실 수 있습니다.</p>` : ''}
+          <table class="bl-table">
+            <tr>
+              <td class="bl-td-label">현장명</td>
+              <td class="bl-td-val" style="font-weight:700">${escapeHtml(j.site_name)}</td>
+            </tr>
+            <tr>
+              <td class="bl-td-label">사업지 주소</td>
+              <td class="bl-td-val">${escapeHtml(j.biz_address||j.work_address||'-')}</td>
+            </tr>
+          </table>
+        </div>
+
+        <!-- 4. 기본요강 -->
+        <div class="bl-section">
+          <div class="bl-section-title"><i class="fas fa-list-alt" style="color:#059669"></i> 기본요강</div>
+          <table class="bl-table bl-table-2col">
+            <tr>
+              <td class="bl-td-label">업종</td>
+              <td class="bl-td-val">
+                ${propTypes.length
+                  ? propTypes.map(t => `<span class="bl-type-tag">${escapeHtml(t)}</span>`).join('')
+                  : '<span class="bl-type-tag">-</span>'}
+              </td>
+              <td class="bl-td-label">직종</td>
+              <td class="bl-td-val" style="font-weight:700">${getRankLabel(j.rank_type)}</td>
+            </tr>
+            <tr>
+              <td class="bl-td-label">성별</td>
+              <td class="bl-td-val">${j.gender==='M'?'남성':j.gender==='F'?'여성':'무관'}</td>
+              <td class="bl-td-label">나이</td>
+              <td class="bl-td-val">${escapeHtml(j.age_condition||'무관')}</td>
+            </tr>
+            <tr>
+              <td class="bl-td-label">경력</td>
+              <td class="bl-td-val">${escapeHtml(j.experience_required||'경력무관')}</td>
+              <td class="bl-td-label">인원</td>
+              <td class="bl-td-val">${escapeHtml(j.recruit_count||'00명')}</td>
+            </tr>
+          </table>
+        </div>
+
+        <!-- 5. 급여정보 -->
+        <div class="bl-section">
+          <div class="bl-section-title"><i class="fas fa-won-sign" style="color:#d97706"></i> 급여정보</div>
+          <table class="bl-table">
+            ${commissionRows.join('')}
+          </table>
+        </div>
+
+        <!-- 6. 근무후생 -->
+        <div class="bl-section">
+          <div class="bl-section-title"><i class="fas fa-gift" style="color:#db2777"></i> 근무후생</div>
+          <table class="bl-table bl-table-2col">
+            ${welfare.map((w,i) => {
+              // 2개씩 한 행으로
+              if (i % 2 === 0) {
+                const next = welfare[i+1];
+                return `<tr>
+                  <td class="bl-td-label">${escapeHtml(w.label)}</td>
+                  <td class="bl-td-val">${escapeHtml(w.val)}</td>
+                  ${next ? `<td class="bl-td-label">${escapeHtml(next.label)}</td><td class="bl-td-val">${escapeHtml(next.val)}</td>` : '<td></td><td></td>'}
+                </tr>`;
+              }
+              return '';
+            }).filter(Boolean).join('')}
+          </table>
+        </div>
+
+        <!-- 7. 상세정보 -->
+        ${j.description ? `
+        <div class="bl-section">
+          <div class="bl-section-title"><i class="fas fa-align-left" style="color:#0ea5e9"></i> 상세정보</div>
+          <div class="bl-desc">${escapeHtml(j.description)}</div>
+        </div>` : ''}
+
+        <!-- 공유 버튼바 -->
+        <div class="bl-section">
+          <div class="bl-share-bar">
+            <button class="bl-share-btn" onclick="jobCopyLink('${shareUrl}')">
+              <i class="fas fa-link"></i> URL 복사
+            </button>
+            <button class="bl-share-btn" onclick="window.print()">
+              <i class="fas fa-print"></i> 인쇄
+            </button>
+            <a class="bl-share-btn" href="https://sharer.kakao.com/talk/friends/picker/link?app_key=KAKAO&url=${encodeURIComponent(shareUrl)}" target="_blank">
+              <i class="fas fa-comment" style="color:#FEE500"></i> 카카오 공유
+            </a>
+            <a class="bl-share-btn" href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}" target="_blank">
+              <i class="fab fa-facebook" style="color:#1877f2"></i> 페이스북
+            </a>
+          </div>
+        </div>
+
+        <!-- 관련 구인 공고 -->
+        ${related && related.length ? `
+        <div class="bl-section">
+          <div class="bl-section-title"><i class="fas fa-th-list" style="color:#6366f1"></i> 같은 지역 구인 공고</div>
+          ${related.map(rj => `
+          <div class="bl-related-item" onclick="navigate('/jobs/${rj.id}')">
+            <div class="bl-related-title">${escapeHtml(rj.title)}</div>
+            <div class="bl-related-meta">
+              <span class="bl-related-badge">${escapeHtml(rj.region)}</span>
+              <span>${getRankLabel(rj.rank_type)}</span>
+              ${rj.commission_rate ? `<span style="color:#c0392b;font-weight:700">수수료 ${rj.commission_rate}%</span>` : ''}
+              ${rj.daily_pay > 0 ? `<span style="color:#166534">일비 ${Number(rj.daily_pay).toLocaleString()}원</span>` : ''}
+              <span style="color:#9ca3af">${timeAgo(rj.created_at)}</span>
+            </div>
+          </div>`).join('')}
+        </div>` : ''}
+
+      </div><!-- /메인 컬럼 -->
+
+      <!-- ▌사이드바 -->
+      <div>
+        <div class="bl-sidebar-contact">
+          <!-- 담당자 헤더 -->
+          <div class="bl-contact-header">
+            <i class="fas fa-user-circle" style="font-size:2rem;opacity:0.8"></i>
+            <div style="flex:1">
+              <div class="bl-contact-name">${escapeHtml(j.contact_name)}</div>
+              <a href="tel:${escapeHtml(j.contact_phone)}" class="bl-contact-phone">
+                <i class="fas fa-phone"></i> ${escapeHtml(j.contact_phone)}
+              </a>
+            </div>
+          </div>
+
+          <!-- 전화/문자 버튼 -->
+          <a href="tel:${escapeHtml(j.contact_phone)}" class="bl-call-btn">
+            <i class="fas fa-phone"></i> 전화하기
+          </a>
+          ${j.contact_kakao ? `
+          <div style="padding:0.75rem;background:#fafbfc;border-top:1px solid #e5e7eb;text-align:center">
+            <div style="background:#FEE500;color:#1c1c1c;font-weight:700;font-size:0.85rem;
+              padding:0.5rem 1rem;border-radius:6px;display:inline-block">
+              💬 카카오 ID: ${escapeHtml(j.contact_kakao)}
+            </div>
+          </div>` : ''}
+
+          <!-- 문의 폼 -->
+          <div style="padding:1rem;border-top:1px solid #e5e7eb">
+            <div style="font-size:0.82rem;font-weight:700;color:#374151;margin-bottom:0.65rem">
+              <i class="fas fa-paper-plane" style="color:#1c7cff"></i> 지원 문의
+            </div>
+            <form onsubmit="submitJobInquiry(event, ${j.id})">
+              <div style="margin-bottom:0.5rem">
+                <input class="form-input" name="name" placeholder="이름 *" required
+                  value="${state.user ? escapeHtml(state.user.name) : ''}"
+                  style="font-size:0.85rem;padding:0.5rem 0.75rem">
+              </div>
+              <div style="margin-bottom:0.5rem">
+                <input class="form-input" name="phone" placeholder="연락처 *" required
+                  value="${state.user ? escapeHtml(state.user.phone||'') : ''}"
+                  style="font-size:0.85rem;padding:0.5rem 0.75rem">
+              </div>
+              <div style="margin-bottom:0.65rem">
+                <textarea class="form-textarea" name="message"
+                  placeholder="경력, 희망 조건 등 자유롭게 작성해 주세요"
+                  style="min-height:70px;font-size:0.85rem;resize:vertical"></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary" style="width:100%;font-size:0.88rem;padding:0.6rem">
+                <i class="fas fa-paper-plane"></i> 지원 문의 접수
+              </button>
+            </form>
+            <div id="job-inquiry-result" style="margin-top:0.5rem"></div>
+          </div>
+
+          <!-- 공유 URL -->
+          <div style="padding:0.75rem 1rem;border-top:1px solid #e5e7eb;background:#fafbfc">
+            <div style="font-size:0.72rem;color:#9ca3af;margin-bottom:0.3rem">공유 URL</div>
+            <div style="font-size:0.72rem;color:#6b7280;word-break:break-all;line-height:1.5">${shareUrl}</div>
+            <button onclick="jobCopyLink('${shareUrl}')"
+              style="margin-top:0.5rem;width:100%;padding:0.4rem;border:1px solid #e5e7eb;
+              border-radius:5px;background:#fff;font-size:0.78rem;cursor:pointer;color:#374151;font-family:inherit">
+              <i class="fas fa-copy"></i> 링크 복사
+            </button>
+          </div>
+        </div>
+      </div><!-- /사이드바 -->
+
+    </div><!-- /bl-layout -->
+  </div><!-- /bl-inner -->
+</div><!-- /bl-wrap -->`;
 }
 
 window.jobCopyLink = function(url) {
