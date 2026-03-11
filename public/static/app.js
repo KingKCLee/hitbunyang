@@ -519,7 +519,7 @@ function renderFooter() {
             <div>🏢 대행사 리뷰 점수</div>
             <div style="margin-top:0.5rem;color:rgba(255,255,255,0.35)">를 가중 합산한 0~100점</div>
           </div>
-          <button class="btn btn-sm" style="margin-top:1rem;background:rgba(253,211,77,0.15);color:#fcd34d;border:1px solid rgba(253,211,77,0.3)"
+          <button class="btn btn-sm" style="margin-top:1rem;background:rgba(144,202,249,0.15);color:#90caf9;border:1px solid rgba(144,202,249,0.3)"
             onclick="navigate('/ranking')">
             <i class="fas fa-trophy"></i> 히트랭킹 보기
           </button>
