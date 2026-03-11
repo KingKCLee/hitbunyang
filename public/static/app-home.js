@@ -41,7 +41,7 @@ async function renderHomePage(container) {
   
   document.getElementById('home-content').innerHTML = `
     <!-- 카테고리 그리드 -->
-    <div class="home-section" style="background:#fff;padding:2rem 0 1.5rem;border-bottom:1px solid #f0f2f8">
+    <div class="home-section" style="background:#fff;padding:2rem 0 1.5rem;border-bottom:1px solid #eaf2ff">
       <div class="container">
         ${renderCategoryGrid()}
       </div>
@@ -49,7 +49,7 @@ async function renderHomePage(container) {
     <!-- 히트 TOP 5 -->
     ${renderHitTop5(bestProperties)}
     <!-- 배너 슬라이더 -->
-    <div class="home-section" style="background:#f5f7fb;padding:2rem 0">
+    <div class="home-section" style="background:#f4f8ff;padding:2rem 0">
       <div class="container">
         ${renderBannerSlider(topBanners)}
       </div>
@@ -63,7 +63,7 @@ async function renderHomePage(container) {
       ${renderNewProperties(newProperties)}
     </div>
     <!-- 히트맵 + TV 미니 위젯 -->
-    <div class="home-section" style="background:#f5f7fb;padding:2rem 0">
+    <div class="home-section" style="background:#f4f8ff;padding:2rem 0">
       <div class="container">
         ${renderHomeMiniWidgets()}
       </div>
@@ -108,7 +108,7 @@ function renderHeroSection() {
             <span style="display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,0.15);
               border:1px solid rgba(255,255,255,0.25);border-radius:20px;padding:4px 12px;
               font-size:0.78rem;color:white;font-weight:700">
-              <span style="width:7px;height:7px;border-radius:50%;background:#4fc3f7;animation:pulse 1.5s infinite"></span>
+              <span style="width:7px;height:7px;border-radius:50%;background:#5ba3ff;animation:pulse 1.5s infinite"></span>
               LIVE
             </span>
             <span style="background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);
@@ -130,8 +130,8 @@ function renderHeroSection() {
           <div style="background:white;border-radius:14px;padding:5px;display:flex;align-items:center;
             gap:5px;box-shadow:0 8px 32px rgba(0,0,0,0.2);margin-bottom:1rem">
             <select id="hero-region-sel" style="border:none;outline:none;padding:0.65rem 0.75rem;
-              font-size:0.88rem;color:#1a1a2e;background:transparent;cursor:pointer;font-family:inherit;
-              border-right:1px solid #e5e8f0;min-width:90px">
+              font-size:0.88rem;color:#0e1f40;background:transparent;cursor:pointer;font-family:inherit;
+              border-right:1px solid #d6e4ff;min-width:90px">
               <option value="">전체 지역</option>
               ${['서울','경기북부','경기남부','인천','부산','대구','광주','대전','울산','세종','충청','전라','경상','강원','제주'].map(r =>
                 `<option value="${r}">${r}</option>`).join('')}
@@ -139,8 +139,8 @@ function renderHeroSection() {
             <input type="text" id="hero-search" placeholder="현장명, 지역명으로 검색..."
               onkeydown="if(event.key==='Enter')doHeroSearch()"
               style="flex:1;border:none;outline:none;padding:0.65rem 1rem;
-                font-size:0.9rem;color:#1a1a2e;background:transparent">
-            <button onclick="doHeroSearch()" style="background:#1a237e;color:white;border:none;
+                font-size:0.9rem;color:#0e1f40;background:transparent">
+            <button onclick="doHeroSearch()" style="background:#1c7cff;color:white;border:none;
               padding:0.65rem 1.5rem;border-radius:10px;cursor:pointer;font-weight:700;
               font-size:0.9rem;white-space:nowrap;transition:background 0.2s;font-family:inherit">
               <i class="fas fa-search"></i> 검색
@@ -192,7 +192,7 @@ function renderHeroSection() {
               <i class="fas fa-fire" style="color:#e57373"></i> 히트지수란?
             </div>
             <div style="height:6px;background:rgba(255,255,255,0.15);border-radius:3px;margin-bottom:0.75rem;overflow:hidden">
-              <div style="height:100%;width:85%;background:linear-gradient(90deg,#4fc3f7,#e57373);border-radius:3px"></div>
+              <div style="height:100%;width:85%;background:linear-gradient(90deg,#1c7cff,#ff3b3b);border-radius:3px"></div>
             </div>
             <div style="display:flex;flex-wrap:wrap;gap:0.35rem;margin-bottom:0.75rem">
               ${['📊 조회수','💬 문의수','🔗 공유수','⭐ 광고등급','🏢 대행사평점'].map(t =>
@@ -238,7 +238,7 @@ window.doHeroSearch = doHeroSearch;
 // ============================================================
 function renderCategoryGrid() {
   const cats = [
-    { icon: '🏙️', name: '아파트', sub: '분양/입주', color: '#e8f0fe', route: '/sites?type=apartment' },
+    { icon: '🏙️', name: '아파트', sub: '분양/입주', color: '#e8f2ff', route: '/sites?type=apartment' },
     { icon: '🏢', name: '오피스텔', sub: '주거형/업무형', color: '#fce4ec', route: '/sites?type=officetel', badge: '인기' },
     { icon: '🏪', name: '상가', sub: '근린/복합', color: '#fff9c4', route: '/sites?type=commercial' },
     { icon: '🏭', name: '지식산업센터', sub: '업무/공장', color: '#e8f5e9', route: '/sites?type=industrial' },
@@ -249,11 +249,11 @@ function renderCategoryGrid() {
   ];
   return `
   <div style="margin-bottom:0.5rem;display:flex;align-items:center;justify-content:space-between">
-    <div style="font-size:0.82rem;color:#666c7e;font-weight:500">
+    <div style="font-size:0.82rem;color:#4a5980;font-weight:500">
       <i class="fas fa-fire" style="color:#e53935;margin-right:4px"></i>
-      전국 <strong style="color:#1a237e">314,124개</strong> 분양 단지 정보
+      전국 <strong style="color:#1c7cff">314,124개</strong> 분양 단지 정보
     </div>
-    <a style="font-size:0.82rem;color:#1a237e;font-weight:600;cursor:pointer"
+    <a style="font-size:0.82rem;color:#1c7cff;font-weight:600;cursor:pointer"
       onclick="navigate('/sites')">전체보기 →</a>
   </div>
   <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.85rem">
@@ -261,14 +261,14 @@ function renderCategoryGrid() {
       <div onclick="navigate('${c.route}')"
         style="background:${c.color};border-radius:14px;padding:1.2rem 0.75rem;text-align:center;
           cursor:pointer;border:1.5px solid transparent;transition:all 0.2s;position:relative;
-          box-shadow:0 1px 4px rgba(26,35,126,0.06)"
-        onmouseover="this.style.borderColor='#3949ab';this.style.transform='translateY(-3px)';this.style.boxShadow='0 6px 18px rgba(26,35,126,0.12)'"
-        onmouseout="this.style.borderColor='transparent';this.style.transform='translateY(0)';this.style.boxShadow='0 1px 4px rgba(26,35,126,0.06)'">
+          box-shadow:0 1px 4px rgba(28,124,255,0.08)"
+        onmouseover="this.style.borderColor='#5ba3ff';this.style.transform='translateY(-3px)';this.style.boxShadow='0 6px 18px rgba(28,124,255,0.14)'"
+        onmouseout="this.style.borderColor='transparent';this.style.transform='translateY(0)';this.style.boxShadow='0 1px 4px rgba(28,124,255,0.08)'">
         ${c.badge ? `<span style="position:absolute;top:7px;right:7px;background:#e53935;color:white;
           font-size:0.58rem;font-weight:800;padding:2px 5px;border-radius:4px">${c.badge}</span>` : ''}
         <div style="font-size:1.8rem;margin-bottom:0.4rem">${c.icon}</div>
-        <div style="font-size:0.88rem;font-weight:700;color:#1a1a2e;margin-bottom:2px">${c.name}</div>
-        <div style="font-size:0.72rem;color:#666c7e">${c.sub}</div>
+        <div style="font-size:0.88rem;font-weight:700;color:#0e1f40;margin-bottom:2px">${c.name}</div>
+        <div style="font-size:0.72rem;color:#4a5980">${c.sub}</div>
       </div>
     `).join('')}
   </div>`;
@@ -285,7 +285,7 @@ function renderHitTop5(properties) {
   <div class="home-section" style="background:#fff;padding:2rem 0">
     <div class="container">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem">
-        <h2 class="section-title">🔥 히트 TOP 5 <span style="font-size:0.82rem;font-weight:500;color:#666c7e;margin-left:0.5rem">히트지수 최고 현장</span></h2>
+        <h2 class="section-title">🔥 히트 TOP 5 <span style="font-size:0.82rem;font-weight:500;color:#4a5980;margin-left:0.5rem">히트지수 최고 현장</span></h2>
         <a class="section-link" href="/ranking" onclick="navigate('/ranking');return false">전체 랭킹 <i class="fas fa-chevron-right"></i></a>
       </div>
       <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:0.85rem">
@@ -303,11 +303,11 @@ function renderHitTop5Card(p, rank) {
   
   return `
   <div onclick="navigate('/properties/${p.id}')"
-    style="background:white;border-radius:14px;overflow:hidden;border:1.5px solid #e5e8f0;
-      cursor:pointer;transition:all 0.22s;box-shadow:0 2px 8px rgba(26,35,126,0.06);
-      ${rank === 0 ? 'border-color:#1a237e;box-shadow:0 4px 20px rgba(26,35,126,0.15)' : ''}"
-    onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 28px rgba(26,35,126,0.14)'"
-    onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='${rank===0?'0 4px 20px rgba(26,35,126,0.15)':'0 2px 8px rgba(26,35,126,0.06)'}'">
+    style="background:white;border-radius:14px;overflow:hidden;border:1.5px solid #d6e4ff;
+      cursor:pointer;transition:all 0.22s;box-shadow:0 2px 8px rgba(28,124,255,0.08);
+      ${rank === 0 ? 'border-color:#1c7cff;box-shadow:0 4px 20px rgba(26,35,126,0.15)' : ''}"
+    onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 28px rgba(28,124,255,0.18)'"
+    onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='${rank===0?'0 4px 20px rgba(26,35,126,0.15)':'0 2px 8px rgba(28,124,255,0.08)'}'">
     <!-- 이미지 영역 -->
     <div style="height:120px;background:${getPropertyBgImage(p.property_type)};
       display:flex;align-items:center;justify-content:center;position:relative">
@@ -333,20 +333,20 @@ function renderHitTop5Card(p, rank) {
     </div>
     <div style="padding:0.8rem">
       <div style="display:flex;gap:0.3rem;margin-bottom:0.4rem;flex-wrap:wrap">
-        <span style="background:rgba(26,35,126,0.08);color:#1a237e;padding:2px 7px;
+        <span style="background:rgba(26,35,126,0.08);color:#1c7cff;padding:2px 7px;
           border-radius:4px;font-size:0.68rem;font-weight:700">${escapeHtml(p.region)}</span>
         <span style="background:#f5f5f5;color:#666;padding:2px 7px;
           border-radius:4px;font-size:0.68rem">${getPropertyTypeLabel(p.property_type)}</span>
       </div>
-      <div style="font-size:0.85rem;font-weight:700;color:#1a1a2e;line-height:1.35;
+      <div style="font-size:0.85rem;font-weight:700;color:#0e1f40;line-height:1.35;
         overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
         margin-bottom:0.4rem">${escapeHtml(p.title)}</div>
-      <div style="font-size:0.9rem;font-weight:900;color:#1a237e;margin-bottom:0.5rem">
+      <div style="font-size:0.9rem;font-weight:900;color:#1c7cff;margin-bottom:0.5rem">
         ${formatPriceRange(p.price_min, p.price_max)}
       </div>
       <!-- 히트지수 바 -->
       <div style="display:flex;align-items:center;gap:6px">
-        <div style="flex:1;height:4px;background:#e5e8f0;border-radius:2px;overflow:hidden">
+        <div style="flex:1;height:4px;background:#d6e4ff;border-radius:2px;overflow:hidden">
           <div style="height:100%;width:${score}%;background:${color};border-radius:2px;
             transition:width 0.6s ease"></div>
         </div>
@@ -364,8 +364,8 @@ let currentBannerIndex = 0;
 let totalBanners = 0;
 
 const BANNER_COLORS = [
-  'linear-gradient(135deg, #1a237e 0%, #3949ab 100%)',
-  'linear-gradient(135deg, #283593 0%, #1565c0 100%)',
+  'linear-gradient(135deg, #1c7cff 0%, #0057d9 100%)',
+  'linear-gradient(135deg, #0057d9 0%, #0042b0 100%)',
   'linear-gradient(135deg, #004d40 0%, #00897b 100%)',
   'linear-gradient(135deg, #4a148c 0%, #7b1fa2 100%)',
   'linear-gradient(135deg, #b71c1c 0%, #e53935 100%)',
@@ -474,7 +474,7 @@ window.prevBanner = prevBanner;
 // ============================================================
 function renderStatsWidget(stats, todayVisitors) {
   const items = [
-    { id: 'stat-total-props', icon: '🏢', label: '총 등록 단지', val: stats?.total_properties || 314124, bg: '#e8f0fe', border: '#c5cbe8' },
+    { id: 'stat-total-props', icon: '🏢', label: '총 등록 단지', val: stats?.total_properties || 314124, bg: '#e8f2ff', border: '#c5cbe8' },
     { id: 'stat-total-jobs', icon: '💼', label: '채용 공고', val: stats?.total_jobs || 52381, bg: '#e8f5e9', border: '#a5d6a7' },
     { id: 'stat-total-members', icon: '👥', label: '누적 회원수', val: stats?.total_members || 128456, bg: '#ede7f6', border: '#ce93d8' },
     { id: 'stat-today-visitors', icon: '👁️', label: '오늘 방문자', val: todayVisitors || 0, bg: '#e1f5fe', border: '#81d4fa' },
@@ -530,7 +530,7 @@ function renderHomeMiniWidgets() {
   <div style="display:grid;grid-template-columns:3fr 2fr;gap:1rem">
     <!-- 히트맵 위젯 -->
     <div onclick="navigate('/hitmap')"
-      style="background:linear-gradient(135deg,#1a237e,#283593);border-radius:16px;
+      style="background:linear-gradient(135deg,#1c7cff,#0057d9);border-radius:16px;
         padding:1.5rem;cursor:pointer;transition:transform 0.2s;min-height:200px;
         display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden"
       onmouseover="this.style.transform='translateY(-3px)'"
@@ -579,15 +579,15 @@ function renderHomeMiniWidgets() {
     
     <!-- 히트TV 위젯 -->
     <div onclick="navigate('/tv')"
-      style="background:white;border-radius:16px;border:1.5px solid #e5e8f0;
-        padding:1.25rem;cursor:pointer;transition:all 0.2s;box-shadow:0 2px 8px rgba(26,35,126,0.06)"
-      onmouseover="this.style.borderColor='#3949ab';this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 24px rgba(26,35,126,0.12)'"
-      onmouseout="this.style.borderColor='#e5e8f0';this.style.transform='translateY(0)';this.style.boxShadow='0 2px 8px rgba(26,35,126,0.06)'">
+      style="background:white;border-radius:16px;border:1.5px solid #d6e4ff;
+        padding:1.25rem;cursor:pointer;transition:all 0.2s;box-shadow:0 2px 8px rgba(28,124,255,0.08)"
+      onmouseover="this.style.borderColor='#5ba3ff';this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 24px rgba(28,124,255,0.14)'"
+      onmouseout="this.style.borderColor='#d6e4ff';this.style.transform='translateY(0)';this.style.boxShadow='0 2px 8px rgba(28,124,255,0.08)'">
       <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:1rem">
         <span style="background:#ffebee;border-radius:10px;padding:0.45rem 0.65rem;font-size:1.1rem">📺</span>
         <div>
-          <div style="font-size:0.95rem;font-weight:800;color:#1a1a2e">히트분양TV</div>
-          <div style="font-size:0.75rem;color:#666c7e">분양 현장 유튜브 채널</div>
+          <div style="font-size:0.95rem;font-weight:800;color:#0e1f40">히트분양TV</div>
+          <div style="font-size:0.75rem;color:#4a5980">분양 현장 유튜브 채널</div>
         </div>
       </div>
       ${[
@@ -596,15 +596,15 @@ function renderHomeMiniWidgets() {
         {title:'분양 팀장 되는 법 A to Z', views:'6.2만'},
       ].map(v => `
         <div style="display:flex;align-items:center;gap:0.65rem;padding:0.55rem 0;
-          border-bottom:1px solid #f0f2f8">
+          border-bottom:1px solid #eaf2ff">
           <div style="width:42px;height:32px;background:#ffebee;border-radius:6px;
             display:flex;align-items:center;justify-content:center;flex-shrink:0">
             <i class="fab fa-youtube" style="color:#e53935;font-size:0.9rem"></i>
           </div>
           <div style="flex:1;overflow:hidden">
             <div style="font-size:0.8rem;font-weight:600;overflow:hidden;white-space:nowrap;
-              text-overflow:ellipsis;color:#1a1a2e">${v.title}</div>
-            <div style="font-size:0.71rem;color:#9ca3af;margin-top:1px">
+              text-overflow:ellipsis;color:#0e1f40">${v.title}</div>
+            <div style="font-size:0.71rem;color:#8fa3c8;margin-top:1px">
               <i class="fas fa-eye"></i> ${v.views}
             </div>
           </div>
@@ -633,16 +633,16 @@ function renderHomeBottomSection(newsList, jobs) {
         <h2 class="section-title">📰 뉴스/공지</h2>
         <a class="section-link" href="/news" onclick="navigate('/news');return false">더보기 <i class="fas fa-chevron-right"></i></a>
       </div>
-      <div style="background:white;border-radius:14px;border:1.5px solid #e5e8f0;overflow:hidden;box-shadow:0 2px 8px rgba(26,35,126,0.05)">
+      <div style="background:white;border-radius:14px;border:1.5px solid #d6e4ff;overflow:hidden;box-shadow:0 2px 8px rgba(26,35,126,0.05)">
         ${newsList && newsList.length 
           ? newsList.map(n => `
             <div class="news-row" onclick="navigate('/news/${n.id}')" style="padding:0.75rem 1rem">
               <span class="news-type-badge news-type-${n.news_type}">${n.news_type==='notice'?'공지':n.news_type==='event'?'이벤트':'뉴스'}</span>
               ${n.is_pinned ? '<i class="fas fa-thumbtack" style="color:#f9a825;font-size:0.7rem"></i>' : ''}
               <span style="flex:1;font-size:0.85rem;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">${escapeHtml(n.title)}</span>
-              <span style="font-size:0.72rem;color:#9ca3af;white-space:nowrap">${timeAgo(n.created_at)}</span>
+              <span style="font-size:0.72rem;color:#8fa3c8;white-space:nowrap">${timeAgo(n.created_at)}</span>
             </div>`).join('')
-          : `<div style="text-align:center;padding:2.5rem;color:#9ca3af;font-size:0.85rem">
+          : `<div style="text-align:center;padding:2.5rem;color:#8fa3c8;font-size:0.85rem">
               <div style="font-size:2rem;margin-bottom:0.5rem">📋</div>
               공지사항이 없습니다
             </div>`
@@ -656,25 +656,25 @@ function renderHomeBottomSection(newsList, jobs) {
         <h2 class="section-title">💬 커뮤니티 HOT</h2>
         <a class="section-link" href="/community" onclick="navigate('/community');return false">더보기 <i class="fas fa-chevron-right"></i></a>
       </div>
-      <div style="background:white;border-radius:14px;border:1.5px solid #e5e8f0;overflow:hidden;box-shadow:0 2px 8px rgba(26,35,126,0.05)">
+      <div style="background:white;border-radius:14px;border:1.5px solid #d6e4ff;overflow:hidden;box-shadow:0 2px 8px rgba(26,35,126,0.05)">
         ${[
-          {cat:'현장후기', catColor:'#1a237e', catBg:'#e8f0fe', title:'래미안 원펜타스 계약 후기 공유합니다', likes:24, comments:8},
+          {cat:'현장후기', catColor:'#1c7cff', catBg:'#e8f2ff', title:'래미안 원펜타스 계약 후기 공유합니다', likes:24, comments:8},
           {cat:'정보공유', catColor:'#2e7d32', catBg:'#e8f5e9', title:'2025년 하반기 분양 일정 총정리', likes:51, comments:15},
           {cat:'자유게시판', catColor:'#6a1b9a', catBg:'#ede7f6', title:'팀장 첫 달 수입 공개 (솔직 후기)', likes:38, comments:22},
           {cat:'Q&A', catColor:'#c62828', catBg:'#ffebee', title:'계약금 환급 조건이 어떻게 되나요?', likes:12, comments:6},
         ].map(p => `
           <div onclick="navigate('/community')"
-            style="padding:0.8rem 1rem;border-bottom:1px solid #f0f2f8;cursor:pointer;
+            style="padding:0.8rem 1rem;border-bottom:1px solid #eaf2ff;cursor:pointer;
               transition:background 0.15s"
-            onmouseover="this.style.background='#f5f7fb'"
+            onmouseover="this.style.background='#f4f8ff'"
             onmouseout="this.style.background='white'">
             <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.3rem">
               <span style="background:${p.catBg};color:${p.catColor};padding:2px 7px;
                 border-radius:4px;font-size:0.69rem;font-weight:700;white-space:nowrap">${p.cat}</span>
               <span style="flex:1;font-size:0.83rem;font-weight:600;overflow:hidden;
-                white-space:nowrap;text-overflow:ellipsis;color:#1a1a2e">${p.title}</span>
+                white-space:nowrap;text-overflow:ellipsis;color:#0e1f40">${p.title}</span>
             </div>
-            <div style="display:flex;gap:0.75rem;font-size:0.72rem;color:#9ca3af">
+            <div style="display:flex;gap:0.75rem;font-size:0.72rem;color:#8fa3c8">
               <span><i class="fas fa-heart" style="color:#e57373"></i> ${p.likes}</span>
               <span><i class="fas fa-comment" style="color:#64b5f6"></i> ${p.comments}</span>
             </div>
@@ -690,8 +690,8 @@ function renderHomeBottomSection(newsList, jobs) {
         <a class="section-link" href="/jobs" onclick="navigate('/jobs');return false">더보기 <i class="fas fa-chevron-right"></i></a>
       </div>
       ${!jobs || !jobs.length 
-        ? `<div style="background:white;border-radius:14px;border:1.5px solid #e5e8f0;
-              padding:2.5rem;text-align:center;color:#9ca3af">
+        ? `<div style="background:white;border-radius:14px;border:1.5px solid #d6e4ff;
+              padding:2.5rem;text-align:center;color:#8fa3c8">
             <div style="font-size:2rem;margin-bottom:0.5rem">💼</div>채용 공고가 없습니다
           </div>`
         : `<div style="display:flex;flex-direction:column;gap:0.5rem">
@@ -711,8 +711,8 @@ function renderJobCardMini(job) {
   <div class="job-card ${job.ad_type==='premium'?'ad-premium':''}" onclick="navigate('/jobs/${job.id}')">
     <div style="display:flex;gap:0.3rem;margin-bottom:0.25rem">${badges.join('')}</div>
     <div class="job-title text-clamp-2">${escapeHtml(job.title)}</div>
-    <div style="display:flex;gap:0.5rem;margin-top:0.3rem;font-size:0.75rem;color:#666c7e;flex-wrap:wrap">
-      <span><i class="fas fa-map-marker-alt" style="color:#1a237e"></i> ${escapeHtml(job.region)}</span>
+    <div style="display:flex;gap:0.5rem;margin-top:0.3rem;font-size:0.75rem;color:#4a5980;flex-wrap:wrap">
+      <span><i class="fas fa-map-marker-alt" style="color:#1c7cff"></i> ${escapeHtml(job.region)}</span>
       ${job.commission_rate ? `<span><i class="fas fa-percent" style="color:#f9a825"></i> ${job.commission_rate}%</span>` : ''}
     </div>
   </div>`;
@@ -723,9 +723,9 @@ function renderJobCardMini(job) {
 // ============================================================
 function renderAdCta() {
   return `
-  <div style="background:linear-gradient(135deg,#1a237e,#283593);border-radius:16px;
+  <div style="background:linear-gradient(135deg,#1c7cff,#0057d9);border-radius:16px;
     padding:2rem 2.5rem;display:flex;align-items:center;justify-content:space-between;
-    box-shadow:0 8px 32px rgba(26,35,126,0.25);flex-wrap:wrap;gap:1.5rem">
+    box-shadow:0 8px 32px rgba(28,124,255,0.28);flex-wrap:wrap;gap:1.5rem">
     <div>
       <div style="background:rgba(255,255,255,0.15);color:white;padding:3px 12px;
         border-radius:20px;font-size:0.75rem;font-weight:700;
@@ -752,7 +752,7 @@ function renderAdCta() {
     </div>
     <div style="display:flex;flex-direction:column;gap:0.5rem">
       <button onclick="navigate('/ad-info')"
-        style="background:white;color:#1a237e;border:none;padding:0.75rem 1.75rem;
+        style="background:white;color:#1c7cff;border:none;padding:0.75rem 1.75rem;
           border-radius:10px;font-size:0.92rem;font-weight:700;cursor:pointer;
           box-shadow:0 4px 12px rgba(0,0,0,0.15);transition:all 0.2s;font-family:inherit"
         onmouseover="this.style.transform='translateY(-2px)'"

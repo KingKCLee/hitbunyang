@@ -25,7 +25,7 @@ function renderLoginPage(container) {
             <div style="position:relative">
               <input class="form-input" name="password" type="password" required placeholder="비밀번호를 입력하세요" id="login-pw">
               <button type="button" onclick="togglePw('login-pw','login-pw-eye')" 
-                style="position:absolute;right:0.75rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#9ca3af">
+                style="position:absolute;right:0.75rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#8fa3c8">
                 <i class="fas fa-eye" id="login-pw-eye"></i>
               </button>
             </div>
@@ -149,7 +149,7 @@ function renderRegisterPage(container) {
             <div style="position:relative">
               <input class="form-input" name="password" type="password" required minlength="8" placeholder="비밀번호" id="reg-pw">
               <button type="button" onclick="togglePw('reg-pw','reg-pw-eye')" 
-                style="position:absolute;right:0.75rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#9ca3af">
+                style="position:absolute;right:0.75rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#8fa3c8">
                 <i class="fas fa-eye" id="reg-pw-eye"></i>
               </button>
             </div>
@@ -388,9 +388,9 @@ async function renderMyInquiries(container) {
           </span>
           <div style="font-weight:600;font-size:0.9rem">${inq.property_title ? escapeHtml(inq.property_title) : inq.job_title ? escapeHtml(inq.job_title) : '일반 문의'}</div>
         </div>
-        <span style="font-size:0.78rem;color:#9ca3af">${formatDate(inq.created_at)}</span>
+        <span style="font-size:0.78rem;color:#8fa3c8">${formatDate(inq.created_at)}</span>
       </div>
-      <div style="font-size:0.85rem;color:#374151;background:#f8fafc;padding:0.75rem;border-radius:6px">${nl2br(inq.message)}</div>
+      <div style="font-size:0.85rem;color:#374151;background:#f4f8ff;padding:0.75rem;border-radius:6px">${nl2br(inq.message)}</div>
       ${inq.reply_message ? `
       <div style="font-size:0.85rem;color:#1e40af;background:#eff6ff;padding:0.75rem;border-radius:6px;margin-top:0.5rem;border-left:3px solid #3b82f6">
         <strong>답변:</strong> ${nl2br(inq.reply_message)}
@@ -496,7 +496,7 @@ async function loadAdminDashboard(container) {
       <div style="padding:0.6rem 0;border-bottom:1px solid #f3f4f6;cursor:pointer" onclick="switchAdminTab('inquiries')">
         <div style="display:flex;justify-content:space-between;align-items:center">
           <span style="font-size:0.85rem;font-weight:${inq.is_read?'400':'700'}">${escapeHtml(inq.name)} - ${escapeHtml(inq.property_title||'일반문의')}</span>
-          <span style="font-size:0.75rem;color:#9ca3af">${timeAgo(inq.created_at)}</span>
+          <span style="font-size:0.75rem;color:#8fa3c8">${timeAgo(inq.created_at)}</span>
         </div>
         <div style="font-size:0.78rem;color:#6b7280;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">${escapeHtml(inq.message)}</div>
       </div>`).join('')}
@@ -511,7 +511,7 @@ async function loadAdminDashboard(container) {
       <div style="padding:0.6rem 0;border-bottom:1px solid #f3f4f6;display:flex;align-items:center;gap:0.75rem;cursor:pointer" onclick="navigate('/properties/${p.id}')">
         <span style="width:24px;height:24px;border-radius:50%;background:${i<3?'#1e40af':'#e5e7eb'};color:${i<3?'white':'#374151'};display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:800;flex-shrink:0">${i+1}</span>
         <span style="flex:1;font-size:0.85rem;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">${escapeHtml(p.title)}</span>
-        <span style="font-size:0.78rem;color:#9ca3af;white-space:nowrap">👁️ ${(p.view_count||0).toLocaleString()}</span>
+        <span style="font-size:0.78rem;color:#8fa3c8;white-space:nowrap">👁️ ${(p.view_count||0).toLocaleString()}</span>
       </div>`).join('')}
     </div>
   </div>
@@ -540,9 +540,9 @@ async function loadAdminInquiries(container) {
           <div style="font-size:0.83rem;color:#6b7280">${escapeHtml(inq.property_title || inq.job_title || '일반문의')}</div>
           <div style="font-size:0.82rem;color:#374151;margin-top:0.25rem;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">${escapeHtml(inq.message)}</div>
         </div>
-        <div style="font-size:0.75rem;color:#9ca3af;white-space:nowrap">${formatDate(inq.created_at)}</div>
+        <div style="font-size:0.75rem;color:#8fa3c8;white-space:nowrap">${formatDate(inq.created_at)}</div>
       </div>
-    </div>`).join('') || '<div style="padding:2rem;text-align:center;color:#9ca3af">문의 내역이 없습니다.</div>'}
+    </div>`).join('') || '<div style="padding:2rem;text-align:center;color:#8fa3c8">문의 내역이 없습니다.</div>'}
   </div>`;
 }
 
@@ -560,7 +560,7 @@ async function loadAdminProperties(container) {
     <div style="overflow-x:auto">
       <table style="width:100%;border-collapse:collapse">
         <thead>
-          <tr style="background:#f8fafc;border-bottom:1px solid #e5e7eb">
+          <tr style="background:#f4f8ff;border-bottom:1px solid #e5e7eb">
             <th style="padding:0.75rem 1rem;text-align:left;font-size:0.82rem;color:#6b7280;font-weight:600">현장명</th>
             <th style="padding:0.75rem 1rem;text-align:left;font-size:0.82rem;color:#6b7280;font-weight:600">지역/유형</th>
             <th style="padding:0.75rem 1rem;text-align:left;font-size:0.82rem;color:#6b7280;font-weight:600">상태</th>
@@ -574,7 +574,7 @@ async function loadAdminProperties(container) {
           <tr style="border-bottom:1px solid #f3f4f6">
             <td style="padding:0.75rem 1rem">
               <div style="font-size:0.88rem;font-weight:600">${escapeHtml(p.title)}</div>
-              <div style="font-size:0.76rem;color:#9ca3af">${formatDate(p.created_at)}</div>
+              <div style="font-size:0.76rem;color:#8fa3c8">${formatDate(p.created_at)}</div>
             </td>
             <td style="padding:0.75rem 1rem;font-size:0.85rem">${escapeHtml(p.region)} / ${getPropertyTypeLabel(p.property_type)}</td>
             <td style="padding:0.75rem 1rem">
@@ -670,7 +670,7 @@ async function loadAdminNews(container) {
         <span style="font-size:0.88rem;font-weight:600">${escapeHtml(n.title)}</span>
       </div>
       <div style="display:flex;gap:0.4rem;align-items:center;flex-shrink:0">
-        <span style="font-size:0.75rem;color:#9ca3af">${formatDate(n.created_at)}</span>
+        <span style="font-size:0.75rem;color:#8fa3c8">${formatDate(n.created_at)}</span>
         <button class="btn btn-sm btn-danger" onclick="deleteNews(${n.id})"><i class="fas fa-trash"></i></button>
       </div>
     </div>`).join('')}
@@ -821,11 +821,11 @@ window.openInquiryDetail = async function(id, el) {
     <button class="modal-close" onclick="closeModal()">✕</button>
   </div>
   <div style="margin-bottom:1rem">
-    <div style="font-size:0.8rem;color:#9ca3af;margin-bottom:0.25rem">문의자</div>
+    <div style="font-size:0.8rem;color:#8fa3c8;margin-bottom:0.25rem">문의자</div>
     <div style="font-weight:700">${escapeHtml(data?.name||'')}</div>
     <div style="color:#1e40af">${escapeHtml(data?.phone||'')}</div>
   </div>
-  <div style="background:#f8fafc;border-radius:8px;padding:0.75rem;margin-bottom:1rem;font-size:0.88rem">
+  <div style="background:#f4f8ff;border-radius:8px;padding:0.75rem;margin-bottom:1rem;font-size:0.88rem">
     ${nl2br(data?.message||'')}
   </div>
   <form onsubmit="submitReply(event,${id})">

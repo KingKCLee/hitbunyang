@@ -23,7 +23,7 @@ const KAKAO_JS_KEY = 'b38c1ed11450dcd7de78ba73bf36c9d8';
 function getHitMarkerColor(score) {
   if (score >= 80) return { bg: '#e53935', border: '#b71c1c', text: '🔴' };
   if (score >= 50) return { bg: '#f4511e', border: '#bf360c', text: '🟠' };
-  return { bg: '#1a237e', border: '#0d1257', text: '🔵' };
+  return { bg: '#1c7cff', border: '#0042b0', text: '🔵' };
 }
 
 // ============================================================
@@ -32,7 +32,7 @@ function getHitMarkerColor(score) {
 async function renderHitmapPageContent(container) {
   container.innerHTML = `
     <!-- 헤더 -->
-    <div style="background:linear-gradient(135deg,#1a237e,#283593);padding:1.25rem 0;color:white">
+    <div style="background:linear-gradient(135deg,#1c7cff,#0057d9);padding:1.25rem 0;color:white">
       <div class="container" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.75rem">
         <div>
           <h1 style="font-size:1.4rem;font-weight:900;margin-bottom:0.15rem">
@@ -52,7 +52,7 @@ async function renderHitmapPageContent(container) {
               <span style="width:10px;height:10px;background:#f4511e;border-radius:50%;display:inline-block"></span>50~79
             </span>
             <span style="display:flex;align-items:center;gap:4px">
-              <span style="width:10px;height:10px;background:#1a237e;border-radius:50%;display:inline-block"></span>~49
+              <span style="width:10px;height:10px;background:#1c7cff;border-radius:50%;display:inline-block"></span>~49
             </span>
           </div>
           <a href="tel:1533-9077" style="background:rgba(255,255,255,0.15);color:white;
@@ -65,8 +65,8 @@ async function renderHitmapPageContent(container) {
     </div>
 
     <!-- 필터 바 -->
-    <div style="background:white;border-bottom:1px solid #e5e8f0;padding:0.75rem 0;
-      position:sticky;top:var(--navbar-h,112px);z-index:50;box-shadow:0 2px 8px rgba(26,35,126,0.06)">
+    <div style="background:white;border-bottom:1px solid #d6e4ff;padding:0.75rem 0;
+      position:sticky;top:var(--navbar-h,112px);z-index:50;box-shadow:0 2px 8px rgba(28,124,255,0.08)">
       <div class="container">
         <div style="display:flex;gap:0.6rem;align-items:center;flex-wrap:wrap">
           <!-- 유형 필터 -->
@@ -76,7 +76,7 @@ async function renderHitmapPageContent(container) {
             <button class="filter-btn" onclick="filterMapType('officetel',this)">🏢 오피스텔</button>
             <button class="filter-btn" onclick="filterMapType('commercial',this)">🏪 상가</button>
           </div>
-          <div style="width:1px;height:24px;background:#e5e8f0;flex-shrink:0"></div>
+          <div style="width:1px;height:24px;background:#d6e4ff;flex-shrink:0"></div>
           <!-- 지역 필터 -->
           <select class="filter-select" id="map-region-filter" onchange="filterMapRegion(this.value)">
             <option value="">🗺️ 전체 지역</option>
@@ -84,7 +84,7 @@ async function renderHitmapPageContent(container) {
               `<option value="${r}">${r}</option>`
             ).join('')}
           </select>
-          <div style="width:1px;height:24px;background:#e5e8f0;flex-shrink:0"></div>
+          <div style="width:1px;height:24px;background:#d6e4ff;flex-shrink:0"></div>
           <!-- 위치/검색 -->
           <button class="btn btn-primary btn-sm" onclick="getMyLocation()" style="gap:0.3rem">
             <i class="fas fa-location-arrow"></i> 내 위치
@@ -126,8 +126,8 @@ async function renderHitmapPageContent(container) {
             background:rgba(232,240,254,0.92);display:flex;align-items:center;
             justify-content:center;border-radius:14px;z-index:10">
             <div style="text-align:center">
-              <div class="spinner" style="margin:0 auto 1rem;border-top-color:#1a237e"></div>
-              <div style="font-size:0.88rem;color:#1a237e;font-weight:600">
+              <div class="spinner" style="margin:0 auto 1rem;border-top-color:#1c7cff"></div>
+              <div style="font-size:0.88rem;color:#1c7cff;font-weight:600">
                 <i class="fas fa-map-marked-alt"></i> 카카오맵 로딩 중...
               </div>
             </div>
@@ -135,34 +135,34 @@ async function renderHitmapPageContent(container) {
           <!-- 맵 타입 컨트롤 (지도/스카이뷰) -->
           <div style="position:absolute;top:12px;left:12px;z-index:20;display:flex;gap:4px">
             <button onclick="setMapType('roadmap')" id="map-type-road"
-              style="background:white;border:1.5px solid #e5e8f0;padding:6px 12px;
+              style="background:white;border:1.5px solid #d6e4ff;padding:6px 12px;
                 border-radius:6px 0 0 6px;font-size:0.77rem;font-weight:700;cursor:pointer;
-                color:#1a237e;font-family:inherit">지도</button>
+                color:#1c7cff;font-family:inherit">지도</button>
             <button onclick="setMapType('skyview')" id="map-type-sky"
-              style="background:white;border:1.5px solid #e5e8f0;padding:6px 12px;
+              style="background:white;border:1.5px solid #d6e4ff;padding:6px 12px;
                 border-radius:0 6px 6px 0;font-size:0.77rem;font-weight:600;cursor:pointer;
-                color:#666c7e;font-family:inherit">스카이뷰</button>
+                color:#4a5980;font-family:inherit">스카이뷰</button>
           </div>
         </div>
 
         <!-- 사이드바 -->
         <div style="display:flex;flex-direction:column;gap:0.75rem">
           <!-- 현장 목록 -->
-          <div style="background:white;border-radius:14px;border:1.5px solid #e5e8f0;
-            overflow:hidden;box-shadow:0 2px 10px rgba(26,35,126,0.06);flex:1">
-            <div style="padding:0.9rem 1rem;border-bottom:1px solid #f0f2f8;
+          <div style="background:white;border-radius:14px;border:1.5px solid #d6e4ff;
+            overflow:hidden;box-shadow:0 2px 10px rgba(28,124,255,0.08);flex:1">
+            <div style="padding:0.9rem 1rem;border-bottom:1px solid #eaf2ff;
               display:flex;justify-content:space-between;align-items:center">
-              <div style="font-weight:700;font-size:0.93rem;color:#1a1a2e">
-                <i class="fas fa-list-ul" style="color:#1a237e"></i> 현장 목록
+              <div style="font-weight:700;font-size:0.93rem;color:#0e1f40">
+                <i class="fas fa-list-ul" style="color:#1c7cff"></i> 현장 목록
               </div>
               <div style="display:flex;align-items:center;gap:0.5rem">
                 <span id="map-result-count"
-                  style="font-size:0.78rem;color:#666c7e;background:#f0f2f8;
+                  style="font-size:0.78rem;color:#4a5980;background:#eaf2ff;
                     padding:2px 8px;border-radius:10px">0건</span>
               </div>
             </div>
             <div id="map-property-list" style="max-height:480px;overflow-y:auto;padding:0.5rem">
-              <div style="text-align:center;padding:3rem 1rem;color:#9ca3af">
+              <div style="text-align:center;padding:3rem 1rem;color:#8fa3c8">
                 <div style="font-size:2.5rem;margin-bottom:0.5rem">🗺️</div>
                 <div style="font-size:0.83rem">마커를 클릭하거나<br>내 위치를 검색하세요</div>
               </div>
@@ -171,33 +171,33 @@ async function renderHitmapPageContent(container) {
 
           <!-- 위치 정보 -->
           <div id="location-info" style="display:none;background:white;border-radius:12px;
-            border:1.5px solid #e5e8f0;padding:0.9rem 1rem;box-shadow:0 2px 8px rgba(26,35,126,0.05)">
-            <div style="font-size:0.77rem;color:#9ca3af;margin-bottom:0.2rem">
+            border:1.5px solid #d6e4ff;padding:0.9rem 1rem;box-shadow:0 2px 8px rgba(26,35,126,0.05)">
+            <div style="font-size:0.77rem;color:#8fa3c8;margin-bottom:0.2rem">
               <i class="fas fa-map-marker-alt" style="color:#e53935"></i> 현재 위치
             </div>
-            <div id="location-address" style="font-size:0.86rem;font-weight:600;color:#1a1a2e">
+            <div id="location-address" style="font-size:0.86rem;font-weight:600;color:#0e1f40">
               위치 확인 중...
             </div>
           </div>
 
           <!-- 히트지수 범례 카드 -->
-          <div style="background:white;border-radius:12px;border:1.5px solid #e5e8f0;
+          <div style="background:white;border-radius:12px;border:1.5px solid #d6e4ff;
             padding:0.9rem 1rem;box-shadow:0 2px 8px rgba(26,35,126,0.05)">
-            <div style="font-size:0.78rem;font-weight:700;color:#1a1a2e;margin-bottom:0.6rem">
+            <div style="font-size:0.78rem;font-weight:700;color:#0e1f40;margin-bottom:0.6rem">
               <i class="fas fa-fire" style="color:#e53935"></i> 히트지수 범례
             </div>
             ${[
               {c:'#e53935', label:'🔴 80점 이상', desc:'HOT 현장', range:'80~100'},
               {c:'#f4511e', label:'🟠 50~79점', desc:'인기 현장', range:'50~79'},
-              {c:'#1a237e', label:'🔵 49점 이하', desc:'일반 현장', range:'0~49'},
+              {c:'#1c7cff', label:'🔵 49점 이하', desc:'일반 현장', range:'0~49'},
             ].map(l => `
               <div style="display:flex;align-items:center;gap:0.6rem;padding:0.35rem 0;
-                border-bottom:1px solid #f0f2f8">
+                border-bottom:1px solid #eaf2ff">
                 <div style="width:14px;height:14px;background:${l.c};border-radius:50%;
                   flex-shrink:0;border:2px solid white;box-shadow:0 0 0 1px ${l.c}"></div>
                 <div style="flex:1">
-                  <div style="font-size:0.8rem;font-weight:600;color:#1a1a2e">${l.label}</div>
-                  <div style="font-size:0.71rem;color:#9ca3af">${l.desc} (${l.range})</div>
+                  <div style="font-size:0.8rem;font-weight:600;color:#0e1f40">${l.label}</div>
+                  <div style="font-size:0.71rem;color:#8fa3c8">${l.desc} (${l.range})</div>
                 </div>
               </div>
             `).join('')}
@@ -275,7 +275,7 @@ function initKakaoMap() {
       styles: [
         {
           width: '48px', height: '48px',
-          background: 'rgba(26,35,126,0.88)',
+          background: 'rgba(28,124,255,0.88)',
           borderRadius: '50%',
           color: '#fff',
           textAlign: 'center',
@@ -283,11 +283,11 @@ function initKakaoMap() {
           lineHeight: '48px',
           fontSize: '13px',
           border: '3px solid rgba(255,255,255,0.35)',
-          boxShadow: '0 4px 12px rgba(26,35,126,0.4)',
+          boxShadow: '0 4px 12px rgba(28,124,255,0.4)',
         },
         {
           width: '56px', height: '56px',
-          background: 'rgba(229,57,53,0.88)',
+          background: 'rgba(255,59,59,0.88)',
           borderRadius: '50%',
           color: '#fff',
           textAlign: 'center',
@@ -438,46 +438,46 @@ function showPropertyPopupKakao(property, position) {
   const content = document.createElement('div');
   content.style.cssText = `
     width:260px;padding:1rem;background:white;border-radius:12px;
-    box-shadow:0 8px 28px rgba(26,35,126,0.18);font-family:inherit;
-    border:1.5px solid #e5e8f0;
+    box-shadow:0 8px 28px rgba(28,124,255,0.2);font-family:inherit;
+    border:1.5px solid #d6e4ff;
   `;
   content.innerHTML = `
     <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.5rem">
-      <div style="font-size:0.86rem;font-weight:800;color:#1a237e;flex:1;
+      <div style="font-size:0.86rem;font-weight:800;color:#1c7cff;flex:1;
         overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
         line-height:1.4">${escapeHtml(property.title)}</div>
       <button onclick="if(window.kakaoInfoWindow)window.kakaoInfoWindow.close()"
-        style="background:none;border:none;color:#9ca3af;cursor:pointer;font-size:1.1rem;
+        style="background:none;border:none;color:#8fa3c8;cursor:pointer;font-size:1.1rem;
           flex-shrink:0;line-height:1;padding:0 0 0 6px">×</button>
     </div>
     <div style="display:flex;gap:0.35rem;margin-bottom:0.5rem;flex-wrap:wrap">
-      <span style="background:#e8f0fe;color:#1a237e;padding:2px 7px;border-radius:4px;
+      <span style="background:#e8f2ff;color:#1c7cff;padding:2px 7px;border-radius:4px;
         font-size:0.69rem;font-weight:700">${escapeHtml(property.region||'')}</span>
       <span style="background:#f5f5f5;color:#666;padding:2px 7px;border-radius:4px;
         font-size:0.69rem">${getPropertyTypeLabel(property.property_type||'')}</span>
     </div>
-    <div style="font-size:1rem;font-weight:900;color:#1a237e;margin-bottom:0.4rem">
+    <div style="font-size:1rem;font-weight:900;color:#1c7cff;margin-bottom:0.4rem">
       ${formatPriceRange(property.price_min, property.price_max)}
     </div>
     <!-- 히트지수 바 -->
     <div style="margin-bottom:0.65rem">
       <div style="display:flex;justify-content:space-between;font-size:0.7rem;
-        color:#666c7e;margin-bottom:3px">
+        color:#4a5980;margin-bottom:3px">
         <span>히트지수</span><span style="font-weight:800;color:${bg}">${score}점</span>
       </div>
-      <div style="height:5px;background:#e5e8f0;border-radius:3px;overflow:hidden">
+      <div style="height:5px;background:#d6e4ff;border-radius:3px;overflow:hidden">
         <div style="height:100%;width:${score}%;background:${bg};border-radius:3px;
           transition:width 0.4s ease"></div>
       </div>
     </div>
     <div style="display:flex;gap:0.5rem">
       <button onclick="navigate('/properties/${property.id}')"
-        style="flex:1;background:#1a237e;color:white;border:none;padding:0.5rem;
+        style="flex:1;background:#1c7cff;color:white;border:none;padding:0.5rem;
           border-radius:8px;font-size:0.8rem;font-weight:700;cursor:pointer;font-family:inherit">
         상세보기 →
       </button>
       <a href="tel:${escapeHtml(property.contact_phone||'1533-9077')}"
-        style="background:#e8f0fe;color:#1a237e;border:none;padding:0.5rem 0.75rem;
+        style="background:#e8f2ff;color:#1c7cff;border:none;padding:0.5rem 0.75rem;
           border-radius:8px;font-size:0.8rem;font-weight:700;cursor:pointer;
           text-decoration:none;display:flex;align-items:center;gap:4px">
         <i class="fas fa-phone"></i>
@@ -501,7 +501,7 @@ function updateMapList(properties) {
 
   if (!properties.length) {
     list.innerHTML = `
-      <div style="text-align:center;padding:3rem 1rem;color:#9ca3af">
+      <div style="text-align:center;padding:3rem 1rem;color:#8fa3c8">
         <div style="font-size:2rem;margin-bottom:0.5rem">📍</div>
         <div style="font-size:0.82rem">해당 조건의 현장이 없습니다</div>
       </div>`;
@@ -514,21 +514,21 @@ function updateMapList(properties) {
     return `
     <div onclick="navigate('/properties/${p.id}')"
       style="padding:0.75rem;border-radius:10px;cursor:pointer;
-        border:1.5px solid #f0f2f8;margin-bottom:0.4rem;transition:all 0.15s;background:white"
-      onmouseover="this.style.borderColor='#3949ab';this.style.background='#f5f7ff'"
-      onmouseout="this.style.borderColor='#f0f2f8';this.style.background='white'">
+        border:1.5px solid #eaf2ff;margin-bottom:0.4rem;transition:all 0.15s;background:white"
+      onmouseover="this.style.borderColor='#5ba3ff';this.style.background='#f0f7ff'"
+      onmouseout="this.style.borderColor='#eaf2ff';this.style.background='white'">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:0.5rem">
         <div style="flex:1;overflow:hidden">
           <div style="font-size:0.84rem;font-weight:700;margin-bottom:0.2rem;
-            overflow:hidden;white-space:nowrap;text-overflow:ellipsis;color:#1a1a2e">
+            overflow:hidden;white-space:nowrap;text-overflow:ellipsis;color:#0e1f40">
             ${escapeHtml(p.title||'')}
           </div>
-          <div style="font-size:0.72rem;color:#666c7e;display:flex;gap:0.4rem;flex-wrap:wrap">
-            <span style="color:#1a237e;font-weight:600">${escapeHtml(p.region||'')}</span>
+          <div style="font-size:0.72rem;color:#4a5980;display:flex;gap:0.4rem;flex-wrap:wrap">
+            <span style="color:#1c7cff;font-weight:600">${escapeHtml(p.region||'')}</span>
             <span>${getPropertyTypeLabel(p.property_type||'')}</span>
             ${p.is_hot ? '<span style="color:#e53935;font-weight:700">HOT</span>' : ''}
           </div>
-          <div style="font-size:0.85rem;font-weight:800;color:#1a237e;margin-top:0.2rem">
+          <div style="font-size:0.85rem;font-weight:800;color:#1c7cff;margin-top:0.2rem">
             ${formatPriceRange(p.price_min, p.price_max)}
           </div>
         </div>
@@ -587,10 +587,10 @@ function getMyLocation() {
         const myLocEl = document.createElement('div');
         myLocEl.innerHTML = `
           <div style="display:flex;flex-direction:column;align-items:center">
-            <div style="width:20px;height:20px;background:#1a237e;border-radius:50%;
-              border:3px solid white;box-shadow:0 0 0 3px rgba(26,35,126,0.3),0 4px 12px rgba(26,35,126,0.4)">
+            <div style="width:20px;height:20px;background:#1c7cff;border-radius:50%;
+              border:3px solid white;box-shadow:0 0 0 3px rgba(28,124,255,0.3),0 4px 12px rgba(28,124,255,0.4)">
             </div>
-            <div style="width:2px;height:8px;background:#1a237e;margin-top:1px"></div>
+            <div style="width:2px;height:8px;background:#1c7cff;margin-top:1px"></div>
           </div>`;
         userLocationOverlay = new kakao.maps.CustomOverlay({
           position, content: myLocEl, yAnchor: 1.1, zIndex: 10,
@@ -677,13 +677,13 @@ function setMapType(type) {
   if (!kakaoMap) return;
   if (type === 'skyview') {
     kakaoMap.setMapTypeId(kakao.maps.MapTypeId.HYBRID);
-    document.getElementById('map-type-road').style.color = '#9ca3af';
-    document.getElementById('map-type-sky').style.color = '#1a237e';
+    document.getElementById('map-type-road').style.color = '#8fa3c8';
+    document.getElementById('map-type-sky').style.color = '#1c7cff';
     document.getElementById('map-type-sky').style.fontWeight = '700';
   } else {
     kakaoMap.setMapTypeId(kakao.maps.MapTypeId.ROADMAP);
-    document.getElementById('map-type-road').style.color = '#1a237e';
-    document.getElementById('map-type-sky').style.color = '#9ca3af';
+    document.getElementById('map-type-road').style.color = '#1c7cff';
+    document.getElementById('map-type-sky').style.color = '#8fa3c8';
     document.getElementById('map-type-sky').style.fontWeight = '600';
   }
 }
@@ -755,21 +755,21 @@ function showDemoMap() {
   const demos = getDemoMapProperties();
 
   mapEl.innerHTML = `
-    <div style="width:100%;height:100%;background:linear-gradient(135deg,#e8f0fe,#dce8fd);
+    <div style="width:100%;height:100%;background:linear-gradient(135deg,#e8f2ff,#cce0ff);
       display:flex;flex-direction:column;align-items:center;justify-content:center;
       position:relative;overflow:hidden">
       <svg style="position:absolute;inset:0;width:100%;height:100%;opacity:0.12">
-        ${Array.from({length:12},(_,i)=>`<line x1="${i*9}%" y1="0" x2="${i*9}%" y2="100%" stroke="#1a237e" stroke-width="1"/>`).join('')}
-        ${Array.from({length:12},(_,i)=>`<line x1="0" y1="${i*9}%" x2="100%" y2="${i*9}%" stroke="#1a237e" stroke-width="1"/>`).join('')}
+        ${Array.from({length:12},(_,i)=>`<line x1="${i*9}%" y1="0" x2="${i*9}%" y2="100%" stroke="#1c7cff" stroke-width="1"/>`).join('')}
+        ${Array.from({length:12},(_,i)=>`<line x1="0" y1="${i*9}%" x2="100%" y2="${i*9}%" stroke="#1c7cff" stroke-width="1"/>`).join('')}
       </svg>
       ${[
         {x:48,y:40,c:'#e53935',s:88,t:'힐스테이트 판교역',id:1},
         {x:32,y:42,c:'#e53935',s:79,t:'래미안 원펜타스',id:2},
         {x:22,y:36,c:'#f4511e',s:62,t:'DMC SK뷰',id:3},
-        {x:62,y:48,c:'#1a237e',s:41,t:'더샵 하남',id:4},
+        {x:62,y:48,c:'#1c7cff',s:41,t:'더샵 하남',id:4},
         {x:18,y:62,c:'#f4511e',s:55,t:'롯데캐슬',id:5},
         {x:55,y:30,c:'#f4511e',s:68,t:'광교 아이파크',id:7},
-        {x:72,y:72,c:'#1a237e',s:32,t:'포레나 부산',id:8},
+        {x:72,y:72,c:'#1c7cff',s:32,t:'포레나 부산',id:8},
       ].map(m=>`
         <div onclick="navigate('/properties/${m.id}')" style="
           position:absolute;left:${m.x}%;top:${m.y}%;
@@ -787,13 +787,13 @@ function showDemoMap() {
         </div>
       `).join('')}
       <div style="text-align:center;z-index:1;background:rgba(255,255,255,0.92);
-        padding:1rem 1.5rem;border-radius:14px;box-shadow:0 4px 20px rgba(26,35,126,0.12);
-        border:1px solid #e5e8f0">
+        padding:1rem 1.5rem;border-radius:14px;box-shadow:0 4px 20px rgba(28,124,255,0.14);
+        border:1px solid #d6e4ff">
         <div style="font-size:2rem;margin-bottom:0.5rem">🗺️</div>
-        <div style="font-weight:800;font-size:0.9rem;color:#1a237e;margin-bottom:0.3rem">
+        <div style="font-weight:800;font-size:0.9rem;color:#1c7cff;margin-bottom:0.3rem">
           카카오맵 연동 완료
         </div>
-        <div style="font-size:0.77rem;color:#666c7e;max-width:200px;line-height:1.5">
+        <div style="font-size:0.77rem;color:#4a5980;max-width:200px;line-height:1.5">
           hitbunyang.com 도메인 등록 후<br>실제 지도가 표시됩니다
         </div>
       </div>

@@ -351,13 +351,13 @@ function renderFloatingButtons() {
   <div class="modal-overlay" id="write-modal" style="display:none" onclick="if(event.target===this)closeWriteModal()">
     <div class="modal-content" style="max-width:600px;width:95%;max-height:90vh;overflow-y:auto">
       <div style="display:flex;justify-content:space-between;align-items:center;
-        padding:1.25rem 1.5rem;border-bottom:1px solid #e5e8f0;position:sticky;top:0;
+        padding:1.25rem 1.5rem;border-bottom:1px solid #d6e4ff;position:sticky;top:0;
         background:white;z-index:1;border-radius:16px 16px 0 0">
-        <h3 style="font-size:1.1rem;font-weight:800;color:#1a1a2e">
-          <i class="fas fa-pen" style="color:#1a237e;margin-right:0.4rem"></i> 글쓰기
+        <h3 style="font-size:1.1rem;font-weight:800;color:#0e1f40">
+          <i class="fas fa-pen" style="color:#1c7cff;margin-right:0.4rem"></i> 글쓰기
         </h3>
         <button onclick="closeWriteModal()"
-          style="background:none;border:none;font-size:1.4rem;color:#9ca3af;cursor:pointer;line-height:1">×</button>
+          style="background:none;border:none;font-size:1.4rem;color:#8fa3c8;cursor:pointer;line-height:1">×</button>
       </div>
       <div style="padding:1.5rem">
         <!-- 카테고리 선택 -->
@@ -374,7 +374,7 @@ function renderFloatingButtons() {
             ].map(c => `
               <button class="write-cat-btn" data-cat="${c.id}" onclick="selectWriteCat('${c.id}',this)"
                 style="padding:0.45rem 0.9rem;border-radius:20px;font-size:0.82rem;font-weight:600;
-                  border:1.5px solid #e5e8f0;background:white;color:#6b7280;cursor:pointer;
+                  border:1.5px solid #d6e4ff;background:white;color:#6b7280;cursor:pointer;
                   font-family:inherit;transition:all 0.15s">
                 ${c.icon} ${c.label}
               </button>`).join('')}
@@ -390,14 +390,14 @@ function renderFloatingButtons() {
             placeholder="제목을 입력해주세요"
             style="width:100%"
             maxlength="100">
-          <div style="text-align:right;font-size:0.72rem;color:#9ca3af;margin-top:2px">
+          <div style="text-align:right;font-size:0.72rem;color:#8fa3c8;margin-top:2px">
             <span id="write-title-count">0</span>/100
           </div>
         </div>
         <!-- 현장 연결 (선택) -->
         <div style="margin-bottom:1rem">
           <label style="font-size:0.83rem;font-weight:700;color:#374151;display:block;margin-bottom:0.4rem">
-            관련 현장 <span style="font-size:0.75rem;color:#9ca3af;font-weight:400">(선택)</span>
+            관련 현장 <span style="font-size:0.75rem;color:#8fa3c8;font-weight:400">(선택)</span>
           </label>
           <input type="text" id="write-site" class="form-input"
             placeholder="예: 래미안 원펜타스, 힐스테이트 판교역..."
@@ -414,13 +414,13 @@ function renderFloatingButtons() {
             maxlength="2000"
             style="width:100%;resize:vertical;min-height:200px"
             oninput="document.getElementById('write-content-count').textContent=this.value.length"></textarea>
-          <div style="text-align:right;font-size:0.72rem;color:#9ca3af;margin-top:2px">
+          <div style="text-align:right;font-size:0.72rem;color:#8fa3c8;margin-top:2px">
             <span id="write-content-count">0</span>/2000
           </div>
         </div>
         <!-- 익명 선택 -->
         <div style="margin-bottom:1.5rem;display:flex;align-items:center;gap:0.5rem">
-          <input type="checkbox" id="write-anonymous" style="width:16px;height:16px;cursor:pointer;accent-color:#1a237e">
+          <input type="checkbox" id="write-anonymous" style="width:16px;height:16px;cursor:pointer;accent-color:#1c7cff">
           <label for="write-anonymous" style="font-size:0.83rem;color:#374151;cursor:pointer;font-weight:500">
             익명으로 작성
           </label>
@@ -428,20 +428,20 @@ function renderFloatingButtons() {
         <!-- 버튼 -->
         <div style="display:flex;gap:0.75rem">
           <button onclick="closeWriteModal()"
-            style="flex:1;padding:0.75rem;border-radius:10px;border:1.5px solid #e5e8f0;
+            style="flex:1;padding:0.75rem;border-radius:10px;border:1.5px solid #d6e4ff;
               background:white;color:#6b7280;font-size:0.9rem;font-weight:600;cursor:pointer;
               font-family:inherit">
             취소
           </button>
           <button onclick="submitPost()"
             style="flex:2;padding:0.75rem;border-radius:10px;border:none;
-              background:linear-gradient(135deg,#1a237e,#3949ab);color:white;
+              background:linear-gradient(135deg,#1c7cff,#5ba3ff);color:white;
               font-size:0.9rem;font-weight:700;cursor:pointer;font-family:inherit;
-              box-shadow:0 4px 12px rgba(26,35,126,0.3)">
+              box-shadow:0 4px 12px rgba(28,124,255,0.3)">
             <i class="fas fa-paper-plane"></i> 등록하기
           </button>
         </div>
-        <p style="text-align:center;font-size:0.75rem;color:#9ca3af;margin-top:0.75rem">
+        <p style="text-align:center;font-size:0.75rem;color:#8fa3c8;margin-top:0.75rem">
           <i class="fas fa-lock"></i> 게시물은 커뮤니티 이용약관에 따라 관리됩니다
         </p>
       </div>
@@ -505,12 +505,12 @@ function selectWriteCat(catId, btn) {
   document.querySelectorAll('.write-cat-btn').forEach(b => {
     b.style.background = 'white';
     b.style.color = '#6b7280';
-    b.style.borderColor = '#e5e8f0';
+    b.style.borderColor = '#d6e4ff';
   });
   if (btn) {
-    btn.style.background = '#e8f0fe';
-    btn.style.color = '#1a237e';
-    btn.style.borderColor = '#1a237e';
+    btn.style.background = '#e8f2ff';
+    btn.style.color = '#1c7cff';
+    btn.style.borderColor = '#1c7cff';
   }
   const inp = document.getElementById('write-cat-value');
   if (inp) inp.value = catId;
@@ -558,7 +558,7 @@ function showToast(msg, type = 'info') {
     toast.id = 'global-toast';
     document.body.appendChild(toast);
   }
-  const colors = { success: '#2e7d32', error: '#c62828', info: '#1a237e', warning: '#f9a825' };
+  const colors = { success: '#2e7d32', error: '#c62828', info: '#1c7cff', warning: '#f9a825' };
   toast.style.cssText = `
     position:fixed;bottom:90px;left:50%;transform:translateX(-50%);
     background:${colors[type]||colors.info};color:white;
@@ -767,7 +767,7 @@ function renderFooter() {
             <div>🏢 대행사 리뷰 점수</div>
             <div style="margin-top:0.5rem;color:rgba(255,255,255,0.35)">를 가중 합산한 0~100점</div>
           </div>
-          <button class="btn btn-sm" style="margin-top:1rem;background:rgba(144,202,249,0.15);color:#90caf9;border:1px solid rgba(144,202,249,0.3)"
+          <button class="btn btn-sm" style="margin-top:1rem;background:rgba(144,202,249,0.15);color:#7dc3ff;border:1px solid rgba(144,202,249,0.3)"
             onclick="navigate('/ranking')">
             <i class="fas fa-trophy"></i> 히트랭킹 보기
           </button>

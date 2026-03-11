@@ -35,7 +35,7 @@ async function renderPropertiesPage(container) {
           </div>
           <div style="display:flex;gap:0.5rem;margin-left:auto;align-items:center;flex-wrap:wrap">
             <div style="position:relative">
-              <i class="fas fa-search" style="position:absolute;left:0.7rem;top:50%;transform:translateY(-50%);color:#9ca3af;font-size:0.8rem"></i>
+              <i class="fas fa-search" style="position:absolute;left:0.7rem;top:50%;transform:translateY(-50%);color:#8fa3c8;font-size:0.8rem"></i>
               <input type="text" id="prop-search" value="${escapeHtml(search)}" placeholder="단지명/지역 검색"
                 style="padding:0.45rem 0.75rem 0.45rem 2rem;border:1.5px solid #e5e7eb;border-radius:8px;font-size:0.85rem;outline:none;width:180px"
                 onkeydown="if(event.key==='Enter')updatePropertyFilter('search',this.value)">

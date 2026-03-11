@@ -1,7 +1,7 @@
 /* ================================================================
-   히트분양 - 다방(Dabang) 톤앤매너 스타일 v5
-   Primary: 화이트 배경 + 다크 네이비 포인트
-   Brand colors: #1a237e (deep navy), #e8f0fe (light blue bg)
+   히트분양 - 브라이트 블루 톤앤매너 v6
+   Primary: #1c7cff (Bright Blue)
+   Light:   #5ba3ff  Dark: #0057d9  BG: #e8f2ff
    Font: Pretendard Variable (다방 동일 CDN)
    ================================================================ */
 
@@ -9,42 +9,44 @@
 @import url('//static.dabangapp.com/web/fonts/pretendard-variable/v1.3.9/pretendardvariable-dynamic-subset.min.gzip.css');
 
 :root {
-  /* 브랜드 컬러 - 다방 스타일 네이비 */
-  --primary: #1a237e;
-  --primary-light: #3949ab;
-  --primary-dark: #0d1257;
-  --primary-bg: #e8f0fe;
-  --primary-bg-light: #f3f6ff;
+  /* ── 브랜드 컬러 #1c7cff 기반 ── */
+  --primary:          #1c7cff;   /* 메인 블루 */
+  --primary-light:    #5ba3ff;   /* 밝은 블루 */
+  --primary-dark:     #0057d9;   /* 진한 블루 */
+  --primary-deeper:   #0042b0;   /* 더 진한 블루 */
+  --primary-bg:       #e8f2ff;   /* 배경 블루 */
+  --primary-bg-light: #f0f7ff;   /* 아주 밝은 배경 */
 
-  /* 포인트 컬러 */
-  --accent-red: #e53935;
-  --accent-orange: #f4511e;
-  --accent-green: #2e7d32;
+  /* ── 포인트 컬러 ── */
+  --accent-red:    #ff3b3b;   /* 강조 레드 (HOT/분양) */
+  --accent-orange: #ff6b2b;   /* 오렌지 */
+  --accent-green:  #00b96b;   /* 성공 그린 */
+  --accent-yellow: #ffbe00;   /* 골드 */
 
-  /* 중성색 */
-  --text-primary: #1a1a2e;
-  --text-secondary: #666c7e;
-  --text-tertiary: #9ca3af;
-  --border: #e5e8f0;
-  --border-light: #f0f2f8;
-  --bg-page: #f5f7fb;
-  --bg-card: #ffffff;
-  --bg-input: #f8f9fc;
+  /* ── 중성색 (블루 틴트 적용) ── */
+  --text-primary:   #0e1f40;   /* 딥 네이비 블랙 */
+  --text-secondary: #4a5980;   /* 블루 그레이 */
+  --text-tertiary:  #8fa3c8;   /* 연한 블루 그레이 */
+  --border:         #d6e4ff;   /* 블루 틴트 보더 */
+  --border-light:   #eaf2ff;   /* 밝은 보더 */
+  --bg-page:        #f4f8ff;   /* 전체 배경 (블루 틴트) */
+  --bg-card:        #ffffff;
+  --bg-input:       #f6f9ff;
 
-  /* 상태 컬러 */
-  --success: #2e7d32;
-  --warning: #f9a825;
-  --danger: #c62828;
+  /* ── 상태 컬러 ── */
+  --success: #00b96b;
+  --warning: #ffbe00;
+  --danger:  #ff3b3b;
 
-  /* 간격 */
+  /* ── 레이아웃 ── */
   --navbar-h: 112px;
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 16px;
   --radius-xl: 20px;
-  --shadow-sm: 0 1px 4px rgba(26,35,126,0.06);
-  --shadow-md: 0 4px 16px rgba(26,35,126,0.1);
-  --shadow-lg: 0 8px 32px rgba(26,35,126,0.14);
+  --shadow-sm: 0 1px 4px rgba(28,124,255,0.08);
+  --shadow-md: 0 4px 16px rgba(28,124,255,0.12);
+  --shadow-lg: 0 8px 32px rgba(28,124,255,0.18);
 }
 
 /* ===== RESET ===== */
@@ -77,7 +79,7 @@ button { font-family: inherit; }
   position: sticky;
   top: 0;
   z-index: 1000;
-  box-shadow: 0 2px 8px rgba(26,35,126,0.06);
+  box-shadow: 0 2px 8px rgba(28,124,255,0.08);
 }
 .navbar-inner { max-width: 1200px; margin: 0 auto; padding: 0 1.25rem; }
 
@@ -263,7 +265,7 @@ button { font-family: inherit; }
   background: white;
   border-top: 1px solid var(--border);
   padding: 1rem;
-  box-shadow: 0 8px 24px rgba(26,35,126,0.1);
+  box-shadow: 0 8px 24px rgba(28,124,255,0.12);
 }
 .mobile-menu.open { display: block; }
 
@@ -373,7 +375,7 @@ button { font-family: inherit; }
    HERO SECTION — 다방 스타일: 연한 파란 배경, 텍스트 다크
    ================================================================ */
 .hero-section {
-  background: linear-gradient(135deg, #1a237e 0%, #283593 40%, #3949ab 100%);
+  background: linear-gradient(135deg, #1c7cff 0%, #0057d9 55%, #0042b0 100%);
   padding: 3rem 0 2.5rem;
   color: white;
   position: relative;
@@ -1118,10 +1120,10 @@ button { font-family: inherit; }
 .empty-state-text { font-size: 1rem; font-weight: 500; }
 
 /* ================================================================
-   FOOTER — 다방 스타일: 다크 네이비
+   FOOTER — 브라이트 블루 다크 버전
    ================================================================ */
 .footer {
-  background: #0d1257;
+  background: linear-gradient(180deg, #003399 0%, #001f66 100%);
   color: rgba(255,255,255,0.6);
   padding: 2.5rem 0 1rem;
   margin-top: 4rem;
@@ -1307,26 +1309,26 @@ button { font-family: inherit; }
 
 /* 글쓰기 버튼 — 네이비 */
 .fab-write {
-  background: linear-gradient(135deg, #1a237e, #3949ab);
+  background: linear-gradient(135deg, #1c7cff, #5ba3ff);
   color: white;
 }
 
 .fab-write:hover {
-  background: linear-gradient(135deg, #0d1257, #1a237e);
+  background: linear-gradient(135deg, #0042b0, #1c7cff);
 }
 
 /* TOP 버튼 — 라이트 그레이 */
 .fab-top {
   background: white;
   color: #374151;
-  border: 1.5px solid #e5e8f0;
+  border: 1.5px solid #d6e4ff;
   box-shadow: 0 2px 12px rgba(0,0,0,0.12);
 }
 
 .fab-top:hover {
-  background: #f5f7ff;
-  color: #1a237e;
-  border-color: #1a237e;
+  background: #f0f7ff;
+  color: #1c7cff;
+  border-color: #1c7cff;
 }
 
 /* 모바일 */

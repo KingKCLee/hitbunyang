@@ -50,7 +50,7 @@ async function renderJobsPage(container) {
               <option value="daily_pay" ${sort==='daily_pay'?'selected':''}>일비 높은순</option>
             </select>
             <div style="position:relative">
-              <i class="fas fa-search" style="position:absolute;left:0.6rem;top:50%;transform:translateY(-50%);color:#9ca3af;font-size:0.8rem"></i>
+              <i class="fas fa-search" style="position:absolute;left:0.6rem;top:50%;transform:translateY(-50%);color:#8fa3c8;font-size:0.8rem"></i>
               <input type="text" id="job-search" value="${escapeHtml(search)}" placeholder="현장명/지역 검색"
                 style="padding:0.45rem 0.75rem 0.45rem 2rem;border:1.5px solid #e5e7eb;border-radius:8px;font-size:0.85rem;outline:none;width:160px"
                 onkeydown="if(event.key==='Enter')updateJobFilter('search',this.value)">
@@ -125,8 +125,8 @@ function renderJobCard(j) {
         <div class="job-site"><i class="fas fa-map-pin"></i> ${escapeHtml(j.site_name)}</div>
       </div>
       <div style="text-align:right;white-space:nowrap">
-        <div style="font-size:0.75rem;color:#9ca3af">${timeAgo(j.created_at)}</div>
-        <div style="font-size:0.75rem;color:#9ca3af;margin-top:0.25rem">조회 ${(j.view_count||0).toLocaleString()}</div>
+        <div style="font-size:0.75rem;color:#8fa3c8">${timeAgo(j.created_at)}</div>
+        <div style="font-size:0.75rem;color:#8fa3c8;margin-top:0.25rem">조회 ${(j.view_count||0).toLocaleString()}</div>
       </div>
     </div>
     <div style="display:flex;gap:0.75rem;font-size:0.82rem;color:#6b7280;flex-wrap:wrap;margin-bottom:0.4rem">
@@ -178,29 +178,29 @@ async function renderJobDetailPage(container, params) {
             <i class="fas fa-building"></i> ${escapeHtml(j.site_name)}
           </div>
           
-          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:0.75rem;background:#f8fafc;border-radius:10px;padding:1rem;margin-bottom:1rem">
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:0.75rem;background:#f4f8ff;border-radius:10px;padding:1rem;margin-bottom:1rem">
             <div>
-              <div style="font-size:0.75rem;color:#9ca3af;margin-bottom:0.2rem">지역</div>
+              <div style="font-size:0.75rem;color:#8fa3c8;margin-bottom:0.2rem">지역</div>
               <div style="font-weight:700">${escapeHtml(j.region)}</div>
             </div>
             <div>
-              <div style="font-size:0.75rem;color:#9ca3af;margin-bottom:0.2rem">모집직급</div>
+              <div style="font-size:0.75rem;color:#8fa3c8;margin-bottom:0.2rem">모집직급</div>
               <div style="font-weight:700">${getRankLabel(j.rank_type)}</div>
             </div>
             ${j.commission_rate ? `<div>
-              <div style="font-size:0.75rem;color:#9ca3af;margin-bottom:0.2rem">수수료</div>
+              <div style="font-size:0.75rem;color:#8fa3c8;margin-bottom:0.2rem">수수료</div>
               <div style="font-weight:700;color:#92400e">${j.commission_rate}%</div>
             </div>` : ''}
             ${j.daily_pay > 0 ? `<div>
-              <div style="font-size:0.75rem;color:#9ca3af;margin-bottom:0.2rem">일비</div>
+              <div style="font-size:0.75rem;color:#8fa3c8;margin-bottom:0.2rem">일비</div>
               <div style="font-weight:700;color:#166534">${j.daily_pay.toLocaleString()}원</div>
             </div>` : ''}
             ${j.accommodation_pay > 0 ? `<div>
-              <div style="font-size:0.75rem;color:#9ca3af;margin-bottom:0.2rem">숙소비</div>
+              <div style="font-size:0.75rem;color:#8fa3c8;margin-bottom:0.2rem">숙소비</div>
               <div style="font-weight:700;color:#6b21a8">${j.accommodation_pay.toLocaleString()}원/월</div>
             </div>` : ''}
             <div>
-              <div style="font-size:0.75rem;color:#9ca3af;margin-bottom:0.2rem">경력요건</div>
+              <div style="font-size:0.75rem;color:#8fa3c8;margin-bottom:0.2rem">경력요건</div>
               <div style="font-weight:600;font-size:0.9rem">${escapeHtml(j.experience_required||'무관')}</div>
             </div>
           </div>
@@ -217,7 +217,7 @@ async function renderJobDetailPage(container, params) {
             <div style="font-size:0.9rem;line-height:1.8;color:#374151">${nl2br(j.description)}</div>
           </div>` : ''}
           
-          <div style="font-size:0.8rem;color:#9ca3af;padding-top:0.75rem;border-top:1px solid #f3f4f6">
+          <div style="font-size:0.8rem;color:#8fa3c8;padding-top:0.75rem;border-top:1px solid #f3f4f6">
             조회 ${(j.view_count||0).toLocaleString()} | 등록 ${timeAgo(j.created_at)}
             ${j.expires_at ? ` | 마감 ${formatDate(j.expires_at)}` : ''}
           </div>
@@ -465,18 +465,18 @@ async function renderNewsPage(container) {
       ${data.length ? data.map((n, i) => `
       <div style="display:flex;align-items:center;padding:0.9rem 1.25rem;${i>0?'border-top:1px solid #f3f4f6':''};cursor:pointer;transition:background 0.15s"
         onclick="navigate('/news/${n.id}')"
-        onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='white'">
+        onmouseover="this.style.background='#f4f8ff'" onmouseout="this.style.background='white'">
         ${n.is_pinned ? '<i class="fas fa-thumbtack" style="color:#f59e0b;margin-right:0.5rem;font-size:0.8rem"></i>' : '<span style="width:1.1rem;display:inline-block"></span>'}
         <span class="news-type-badge news-type-${n.news_type}" style="margin-right:0.75rem;flex-shrink:0">
           ${n.news_type==='notice'?'공지':n.news_type==='event'?'이벤트':'뉴스'}
         </span>
         <span style="flex:1;font-size:0.92rem;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;${n.is_pinned?'font-weight:600':''}">${escapeHtml(n.title)}</span>
-        <div style="display:flex;gap:1rem;font-size:0.78rem;color:#9ca3af;flex-shrink:0;margin-left:1rem">
+        <div style="display:flex;gap:1rem;font-size:0.78rem;color:#8fa3c8;flex-shrink:0;margin-left:1rem">
           <span><i class="fas fa-eye"></i> ${(n.view_count||0).toLocaleString()}</span>
           <span>${formatDate(n.created_at)}</span>
         </div>
       </div>`) .join('')
-      : '<div style="text-align:center;padding:3rem;color:#9ca3af">등록된 게시글이 없습니다.</div>'}
+      : '<div style="text-align:center;padding:3rem;color:#8fa3c8">등록된 게시글이 없습니다.</div>'}
     </div>
     ${renderPagination(page, pages, (p) => navigate('/news?type='+type+'&page='+p))}`;
 }
@@ -503,7 +503,7 @@ async function renderNewsDetailPage(container, params) {
           ${n.news_type==='notice'?'공지사항':n.news_type==='event'?'이벤트':'뉴스'}
         </span>
         <h1 style="font-size:1.35rem;font-weight:800;line-height:1.4;margin-bottom:0.5rem">${escapeHtml(n.title)}</h1>
-        <div style="display:flex;gap:1rem;font-size:0.82rem;color:#9ca3af">
+        <div style="display:flex;gap:1rem;font-size:0.82rem;color:#8fa3c8">
           <span>${escapeHtml(n.author_name || '관리자')}</span>
           <span>${formatDate(n.created_at)}</span>
           <span>조회 ${(n.view_count||0).toLocaleString()}</span>
@@ -517,11 +517,11 @@ async function renderNewsDetailPage(container, params) {
     <!-- 이전/다음 -->
     <div style="background:white;border-radius:12px;margin-top:1rem;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.06)">
       ${prev ? `<div style="display:flex;align-items:center;padding:0.75rem 1.25rem;border-bottom:1px solid #f3f4f6;cursor:pointer" onclick="navigate('/news/${prev.id}')">
-        <span style="font-size:0.78rem;color:#9ca3af;width:50px">◀ 이전글</span>
+        <span style="font-size:0.78rem;color:#8fa3c8;width:50px">◀ 이전글</span>
         <span style="font-size:0.9rem;flex:1">${escapeHtml(prev.title)}</span>
       </div>` : ''}
       ${next ? `<div style="display:flex;align-items:center;padding:0.75rem 1.25rem;cursor:pointer" onclick="navigate('/news/${next.id}')">
-        <span style="font-size:0.78rem;color:#9ca3af;width:50px">▶ 다음글</span>
+        <span style="font-size:0.78rem;color:#8fa3c8;width:50px">▶ 다음글</span>
         <span style="font-size:0.9rem;flex:1">${escapeHtml(next.title)}</span>
       </div>` : ''}
     </div>
@@ -547,13 +547,13 @@ function renderPagination(currentPage, totalPages, onClickFn) {
   const end = Math.min(totalPages, currentPage + 2);
   
   if (start > 1) html += `<button class="page-btn" onclick="_paginationHandler(1)">1</button>`;
-  if (start > 2) html += `<span style="padding:0 0.25rem;color:#9ca3af">...</span>`;
+  if (start > 2) html += `<span style="padding:0 0.25rem;color:#8fa3c8">...</span>`;
   
   for (let i = start; i <= end; i++) {
     html += `<button class="page-btn ${i===currentPage?'active':''}" onclick="_paginationHandler(${i})">${i}</button>`;
   }
   
-  if (end < totalPages - 1) html += `<span style="padding:0 0.25rem;color:#9ca3af">...</span>`;
+  if (end < totalPages - 1) html += `<span style="padding:0 0.25rem;color:#8fa3c8">...</span>`;
   if (end < totalPages) html += `<button class="page-btn" onclick="_paginationHandler(${totalPages})">${totalPages}</button>`;
   
   html += `<button class="page-btn" onclick="_paginationHandler(${currentPage+1})" ${currentPage>=totalPages?'disabled':''}>
