@@ -257,10 +257,22 @@ function getHtmlTemplate(): string {
   <link rel="preconnect" href="//static.dabangapp.com">
   <link rel="stylesheet" href="//static.dabangapp.com/web/fonts/pretendard-variable/v1.3.9/pretendardvariable-dynamic-subset.min.gzip.css">
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Tailwind 폰트 재정의: Pretendard를 기본 폰트로 강제 설정 -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Pretendard Variable', 'Pretendard', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
   <link rel="stylesheet" href="/static/styles.css">
 </head>
-<body class="bg-gray-50 font-sans">
+<body class="bg-gray-50" style="font-family:'Pretendard Variable','Pretendard',-apple-system,BlinkMacSystemFont,system-ui,'Apple SD Gothic Neo','Noto Sans KR','Malgun Gothic',sans-serif;">
   <div id="app"></div>
   <div id="modal-root"></div>
   <script src="/static/app.js" defer></script>
