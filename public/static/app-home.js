@@ -687,7 +687,7 @@ function renderHomeBottomSection(newsList, jobs) {
     <div>
       <div class="section-header">
         <h2 class="section-title">🔥 HOT 채용</h2>
-        <a class="section-link" href="/jobs" onclick="navigate('/jobs');return false">더보기 <i class="fas fa-chevron-right"></i></a>
+        <a class="section-link" href="/sites?tab=jobs" onclick="navigate('/sites?tab=jobs');return false">더보기 <i class="fas fa-chevron-right"></i></a>
       </div>
       ${!jobs || !jobs.length 
         ? `<div style="background:white;border-radius:14px;border:1.5px solid #d6e4ff;

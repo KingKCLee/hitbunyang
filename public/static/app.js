@@ -239,8 +239,8 @@ function getRoutes() {
     // 고객센터
     '/support': renderSupportPage,
     '/faq': renderFaqPage,
-    // 채용
-    '/jobs': renderJobsPage,
+    // 채용 - /sites?tab=jobs 로 통합, 하위 호환 리다이렉트
+    '/jobs': (c) => { navigate('/sites?tab=jobs'); },
     '/jobs/new': renderJobFormPage,
     '/jobs/:id': renderJobDetailPage,
     // 회원
@@ -592,7 +592,6 @@ function renderNavbar() {
 
   const subMenus = [
     { label: '뉴스', path: '/news', icon: 'fa-newspaper' },
-    { label: '채용정보', path: '/jobs', icon: 'fa-briefcase' },
     { label: '광고안내', path: '/ad-info', icon: 'fa-ad' },
     { label: '고객센터', path: '/support', icon: 'fa-headset' },
   ];
@@ -753,7 +752,7 @@ function renderFooter() {
           <div class="footer-section-title">정보</div>
           <div class="footer-links">
             <a class="footer-link" href="/news" onclick="navigate('/news');return false">뉴스/공지</a>
-            <a class="footer-link" href="/jobs" onclick="navigate('/jobs');return false">채용정보</a>
+            <a class="footer-link" href="/sites?tab=jobs" onclick="navigate('/sites?tab=jobs');return false">구인구직</a>
             <a class="footer-link" href="/ad-info" onclick="navigate('/ad-info');return false">광고안내</a>
             <a class="footer-link" href="/support" onclick="navigate('/support');return false">고객센터/FAQ</a>
           </div>

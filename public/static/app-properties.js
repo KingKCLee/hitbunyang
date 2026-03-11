@@ -209,6 +209,21 @@ async function renderPropertyDetailPage(container, params) {
           </div>
         </div>` : ''}
         
+        <!-- 이 현장 구인공고 -->
+        <div id="property-jobs-section" style="margin-bottom:1.5rem">
+          <div class="section-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.75rem">
+            <h3 class="section-title" style="margin:0">💼 이 현장 구인공고</h3>
+            <a href="/sites?tab=jobs&search=${encodeURIComponent(p.title)}" 
+               onclick="navigate('/sites?tab=jobs&search=${encodeURIComponent(p.title)}');return false"
+               style="font-size:0.82rem;color:var(--primary);font-weight:600;text-decoration:none">
+              전체보기 <i class="fas fa-chevron-right"></i>
+            </a>
+          </div>
+          <div id="property-jobs-list">
+            <div class="loading-overlay" style="position:relative;height:60px"><div class="spinner"></div></div>
+          </div>
+        </div>
+
         <!-- 관련 현장 -->
         ${related.length ? `
         <div>
@@ -277,6 +292,77 @@ async function renderPropertyDetailPage(container, params) {
   <style>
     @media(max-width:900px){.detail-grid{grid-template-columns:1fr!important}}
   </style>`;
+
+  // 해당 현장 구인공고 비동기 로드
+  loadPropertyJobs(p.title, p.region);
+}
+
+// ============================================================
+// 현장 상세 - 해당 현장 구인공고 로드
+// ============================================================
+async function loadPropertyJobs(siteName, region) {
+  const el = document.getElementById('property-jobs-list');
+  if (!el) return;
+
+  const params = new URLSearchParams();
+  if (siteName) params.set('search', siteName);
+  params.set('limit', '5');
+
+  const r = await api.get('/jobs?' + params.toString());
+
+  const rankColors = { director:'#7c3aed', team_leader:'#1c7cff', member:'#059669', part_timer:'#d97706' };
+
+  // API 실패 시 같은 지역 구인공고 표시 (데모)
+  const jobs = (r.ok && r.data.data && r.data.data.length > 0) ? r.data.data : null;
+
+  if (!jobs) {
+    el.innerHTML = `
+    <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:1.25rem;text-align:center">
+      <div style="font-size:0.82rem;color:#9ca3af;margin-bottom:0.6rem">등록된 구인공고가 없습니다.</div>
+      <a href="/sites?tab=jobs${region?'&region_job='+encodeURIComponent(region):''}" 
+         onclick="navigate('/sites?tab=jobs${region?'&region_job='+encodeURIComponent(region):''}');return false"
+         style="font-size:0.82rem;color:var(--primary);font-weight:700;text-decoration:none">
+        <i class="fas fa-briefcase"></i> ${region||''} 지역 구인공고 보기
+      </a>
+    </div>`;
+    return;
+  }
+
+  el.innerHTML = `
+  <div style="display:flex;flex-direction:column;gap:0.6rem">
+    ${jobs.map(j => {
+      const rankColor = rankColors[j.rank_type] || '#6b7280';
+      const urgentBadge = j.is_urgent ? '<span class="badge badge-urgent" style="font-size:0.68rem;padding:1px 5px">급구</span>' : '';
+      const hotBadge = j.is_hot ? '<span class="badge badge-hot" style="font-size:0.68rem;padding:1px 5px">HOT</span>' : '';
+      return `
+      <div onclick="navigate('/jobs/${j.id}')" 
+        style="background:white;border:1px solid #e5e7eb;border-radius:10px;padding:0.85rem 1rem;
+          cursor:pointer;transition:all 0.15s;display:flex;justify-content:space-between;align-items:center;gap:0.75rem"
+        onmouseover="this.style.borderColor='var(--primary)';this.style.boxShadow='0 2px 8px rgba(28,124,255,0.12)'"
+        onmouseout="this.style.borderColor='#e5e7eb';this.style.boxShadow='none'">
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;gap:0.3rem;margin-bottom:0.3rem">${urgentBadge}${hotBadge}</div>
+          <div style="font-size:0.9rem;font-weight:800;color:#1f2937;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(j.title)}</div>
+          <div style="display:flex;gap:0.5rem;margin-top:0.3rem;font-size:0.77rem;color:#6b7280;flex-wrap:wrap">
+            <span style="background:${rankColor}15;color:${rankColor};border:1px solid ${rankColor}25;border-radius:4px;padding:1px 5px;font-weight:700">${getRankLabel(j.rank_type)}</span>
+            ${j.experience_required ? `<span>${escapeHtml(j.experience_required)}</span>` : ''}
+          </div>
+        </div>
+        <div style="text-align:right;flex-shrink:0;font-size:0.78rem">
+          ${j.commission_rate ? `<div style="color:#92400e;font-weight:800">수수료 ${j.commission_rate}%</div>` : ''}
+          ${j.daily_pay > 0 ? `<div style="color:#166534;font-weight:700">일비 ${j.daily_pay.toLocaleString()}원</div>` : ''}
+          <div style="color:#9ca3af;margin-top:0.2rem">${timeAgo(j.created_at)}</div>
+        </div>
+      </div>`;
+    }).join('')}
+    <div style="text-align:center;padding:0.5rem 0">
+      <a href="/sites?tab=jobs&search=${encodeURIComponent(siteName)}" 
+         onclick="navigate('/sites?tab=jobs&search=${encodeURIComponent(siteName)}');return false"
+         style="font-size:0.82rem;color:var(--primary);font-weight:700;text-decoration:none">
+        이 현장 구인공고 전체보기 <i class="fas fa-chevron-right"></i>
+      </a>
+    </div>
+  </div>`;
 }
 
 window.submitInquiry = async function(e, propertyId, type) {
